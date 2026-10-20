@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>commit-composer - clean, single-purpose commits from a messy tree</title>
+<meta name="description" content="Point an agent at a messy working tree and get back a clean series of commits, each with one purpose and a title that says it. Cut at the hunk, stopped at the plan, gated by scan and lint.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="commit-composer">
+<meta property="og:description" content="Messy working tree in. Clean, single-purpose commits out.">
+<meta property="og:url" content="https://the-khiem7.github.io/commit-composer/">
+<meta property="og:image" content="https://the-khiem7.github.io/commit-composer/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="commit-composer">
+<meta name="twitter:description" content="Messy working tree in. Clean, single-purpose commits out.">
+<meta name="twitter:image" content="https://the-khiem7.github.io/commit-composer/assets/og.png">
+<meta name="theme-color" content="#e7e9e4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141a1d" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>
+try { var t = localStorage.getItem("cc-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+document.documentElement.classList.add("js");
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@800&family=JetBrains+Mono:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@800&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+<style>
+/* Signature: a railway classification yard. Hunks are wagons, commits are trains, the gates are signals, every section is a station. */
+:root {
+  --paper: #e7e9e4; --ink: #1f2a2e; --muted: #4a565a; --line: #c3c8c2; --panel: #f4f5f1;
+  --amber: #9a6200; --green: #2c7a4b; --red: #b3372b; --slate: #5a676c;
+  --rail: #6d7a7f; --sleeper: #b9bfb8; --onwagon: #ffffff; --board: #1f2a2e; --onboard: #e7e9e4;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141a1d; --ink: #e3e8e4; --muted: #a6b1b4; --line: #2e383c; --panel: #1c2427;
+    --amber: #ffb53d; --green: #5fcf8a; --red: #ff7a6b; --slate: #8b989c;
+    --rail: #7d898e; --sleeper: #2b3438; --onwagon: #141a1d; --board: #e3e8e4; --onboard: #141a1d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141a1d; --ink: #e3e8e4; --muted: #a6b1b4; --line: #2e383c; --panel: #1c2427;
+  --amber: #ffb53d; --green: #5fcf8a; --red: #ff7a6b; --slate: #8b989c;
+  --rail: #7d898e; --sleeper: #2b3438; --onwagon: #141a1d; --board: #e3e8e4; --onboard: #141a1d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 "JetBrains Mono", ui-monospace, Consolas, monospace; overflow-x: hidden; }
+a { color: inherit; }
+.disp { font-family: "Saira Condensed", "Arial Narrow", sans-serif; font-weight: 800; line-height: 1; letter-spacing: .01em; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+p { max-width: 66ch; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+/* top bar with a progress wagon riding the rail */
+.bar { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; align-items: center; gap: 18px; height: 56px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: 24px; }
+.bar nav { display: flex; gap: 4px; margin-left: auto; }
+.bar nav a { text-decoration: none; padding: 10px 10px; font-size: 14px; color: var(--muted); border-radius: 6px; }
+.bar nav a:hover { color: var(--ink); background: var(--panel); }
+.iconbtn { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); cursor: pointer; text-decoration: none; }
+.progress { position: absolute; left: 0; right: 0; bottom: -6px; height: 10px; pointer-events: none; }
+.progress i { position: absolute; left: 0; top: 0; width: 28px; height: 10px; border-radius: 3px; background: var(--amber); transform: translateX(calc(var(--p, 0) * (100vw - 28px))); }
+
+/* hero */
+.hero { padding: 48px 0 24px; }
+.hero h1 { font-size: clamp(56px, 11vw, 132px); margin: 0; }
+.hero .lede { font-size: clamp(18px, 2.2vw, 23px); font-weight: 700; margin: 14px 0 22px; max-width: 46ch; }
+.who { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+.cmd { display: flex; align-items: center; gap: 12px; max-width: 640px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 8px 8px 16px; font-size: 15px; }
+.cmd code { overflow-wrap: anywhere; flex: 1; }
+.cmd code::before { content: "$ "; color: var(--muted); }
+.copy { font: inherit; font-weight: 700; min-height: 44px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--amber); color: var(--onwagon); cursor: pointer; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* figures: SVG yards keep a readable minimum width and scroll on a phone */
+.frame { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); margin-top: 28px; }
+.frame svg { display: block; width: 100%; min-width: 760px; height: auto; }
+.yardctl { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+.btn { font: inherit; font-weight: 700; min-height: 44px; padding: 0 18px; border: 2px solid var(--ink); border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; }
+.btn.solid { background: var(--ink); color: var(--paper); }
+.btn:disabled { opacity: .45; cursor: default; }
+.hit { cursor: pointer; }
+.pulse { animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 var(--amber); } 50% { box-shadow: 0 0 0 6px transparent; } }
+.status { color: var(--muted); font-size: 14px; }
+svg text { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+.rail { stroke: var(--rail); stroke-width: 2.5; fill: none; }
+.tie { stroke: var(--sleeper); stroke-width: 4; }
+
+/* stations */
+.station { padding: 72px 0 24px; scroll-margin-top: 56px; }
+.nameboard { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; background: var(--board); color: var(--onboard); border-radius: 14px; padding: 16px 20px; position: relative; overflow: hidden; }
+.nameboard::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: repeating-linear-gradient(90deg, var(--amber) 0 36px, transparent 36px 72px); }
+.nameboard .name { font-size: clamp(34px, 6vw, 64px); text-align: center; border: 4px solid var(--onboard); border-radius: 12px; padding: 6px 26px; }
+.nameboard a { font-size: 14px; text-decoration: none; opacity: .8; padding: 10px 0; }
+.nameboard a:last-child { text-align: right; }
+.station h2 { font-size: clamp(32px, 5vw, 52px); margin: 36px 0 12px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; padding: 0; list-style: none; }
+.chips li { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+
+/* plan card */
+.plan { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+.plan ol { margin: 0 0 16px; padding: 0; list-style: none; }
+.plan li { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+.plan li b { color: var(--amber); }
+.plan .ids { display: block; color: var(--muted); font-size: 12px; }
+.planfoot { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lamp { width: 22px; height: 22px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 6px var(--board); transition: background .4s; }
+.lamp.go { background: var(--green); }
+
+/* tabs */
+.tabs { display: flex; gap: 8px; margin: 18px 0; flex-wrap: wrap; }
+.tabs [role=tab] { font: inherit; font-weight: 700; min-height: 44px; padding: 0 16px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; cursor: pointer; }
+.tabs [aria-selected=true] { border-color: var(--amber); color: var(--amber); }
+.msg { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 14px; white-space: pre-wrap; margin: 0; }
+.msg .t { font-weight: 700; }
+.msg .l { color: var(--amber); font-weight: 700; }
+.spec { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+
+/* terminus */
+.never { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 24px 0 0; padding: 0; list-style: none; }
+.never li { border-top: 4px solid var(--red); padding-top: 10px; font-size: 14px; }
+.never b { display: block; color: var(--red); }
+
+/* footer */
+.end { padding: 80px 0 48px; text-align: center; }
+.end h2 { font-size: clamp(36px, 6vw, 64px); margin: 0 0 18px; }
+.end .cmd { margin: 0 auto; text-align: left; }
+.links { display: flex; gap: 18px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+.links a { padding: 10px 4px; }
+footer { color: var(--muted); font-size: 13px; text-align: center; padding: 24px 0 40px; border-top: 1px solid var(--line); }
+
+/* motion: hidden start states only once the script runs, and never under reduced motion */
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+.js .reveal.live { opacity: 1; transform: none; }
+.wheel { transform-box: fill-box; transform-origin: center; }
+.live .split1 { animation: split1 3.6s ease-in-out infinite; }
+.live .split2 { animation: split2 3.6s ease-in-out infinite; }
+.live .tag { animation: tagin 3.6s ease-in-out infinite; }
+@keyframes split1 { 0%,15% { transform: translate(0,0); } 55%,85% { transform: translate(420px,-70px); } 100% { transform: translate(0,0); } }
+@keyframes split2 { 0%,15% { transform: translate(0,0); } 55%,85% { transform: translate(330px,70px); } 100% { transform: translate(0,0); } }
+@keyframes tagin { 0%,45% { opacity: 0; } 60%,85% { opacity: 1; } 100% { opacity: 0; } }
+.live .clean { animation: clean 7s linear infinite; }
+.live .dirty { animation: dirty 7s linear infinite; }
+.live .sigscan { animation: sigscan 7s steps(1) infinite; }
+.live .sigl { animation: siglint 7s steps(1) infinite; }
+.live .failtxt { animation: failtxt 7s steps(1) infinite; }
+@keyframes clean { 0% { transform: translateX(0); } 45% { transform: translateX(1000px); } 46%,100% { transform: translateX(1000px); opacity: 0; } }
+@keyframes dirty { 0%,48% { transform: translateX(0); opacity: 0; } 49% { opacity: 1; } 72%,100% { transform: translateX(280px); opacity: 1; } }
+@keyframes sigscan { 0% { fill: var(--green); } 72% { fill: var(--red); } 100% { fill: var(--green); } }
+@keyframes siglint { 0% { fill: var(--green); } }
+@keyframes failtxt { 0% { opacity: 0; } 72% { opacity: 1; } 99% { opacity: 1; } }
+.live .arrive { animation: arrive 5s cubic-bezier(.2,.7,.3,1) infinite; }
+.live .stoplamp { animation: stoplamp 5s steps(1) infinite; }
+@keyframes arrive { 0% { transform: translateX(-700px); } 55%,90% { transform: translateX(0); } 100% { transform: translateX(0); opacity: 0; } }
+@keyframes stoplamp { 0% { opacity: .25; } 20% { opacity: 1; } }
+.train-in { animation: trainin .8s cubic-bezier(.2,.7,.3,1); }
+@keyframes trainin { from { transform: translateX(-420px); } to { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
+  .live .split1 { animation: none; transform: translate(420px,-70px); }
+  .live .split2 { animation: none; transform: translate(330px,70px); }
+  .live .tag { animation: none; opacity: 1; }
+  .live .clean, .live .dirty, .live .sigscan, .live .sigl, .live .failtxt, .live .arrive, .live .stoplamp, .train-in, .pulse { animation: none; }
+  .live .dirty { transform: translateX(280px); }
+  .live .failtxt { opacity: 1; }
+  .live .sigscan { fill: var(--red); }
+}
+
+@media (max-width: 820px) {
+  .bar nav { display: none; }
+  .cols { grid-template-columns: 1fr; }
+  .never { grid-template-columns: 1fr 1fr; }
+  .nameboard { grid-template-columns: 1fr; text-align: center; }
+  .nameboard a, .nameboard a:last-child { text-align: center; padding: 4px 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand disp" href="#top" aria-label="commit-composer, back to top">
+      <svg width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><rect x="1" y="1" width="20" height="20" rx="5" fill="var(--ink)"/><circle cx="11" cy="11" r="5" fill="var(--green)"/><rect x="9" y="21" width="4" height="8" fill="var(--ink)"/></svg>
+      commit-composer
+    </a>
+    <nav aria-label="Stations">
+      <a href="#hunks">Hunks</a><a href="#plan">Plan</a><a href="#gates">Gates</a><a href="#skills">Two skills</a><a href="#terminus">Terminus</a>
+    </nav>
+    <button class="iconbtn" id="theme" type="button" aria-pressed="false" aria-label="Dark theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+    <a class="iconbtn" href="https://github.com/the-khiem7/commit-composer" aria-label="Source on GitHub">
+      <svg width="20" height="20" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.6 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>
+    </a>
+  </div>
+  <div class="progress" aria-hidden="true"><i></i></div>
+</header>
+
+<main id="top">
+<section class="hero wrap" aria-labelledby="h1">
+  <h1 id="h1" class="disp">commit-composer</h1>
+  <p class="lede">Stop shipping "misc fixes". Point an agent at a messy working tree and get back a clean series of commits, each with one purpose and a title that says it.</p>
+  <div class="cmd"><code id="c1">npx skills add the-khiem7/commit-composer</code><button class="copy" type="button" data-copy="c1">Copy</button></div>
+  <p class="who">Agent skills for anyone who commits through an agent, and for whoever reads the log afterwards. Free and open source; no account.</p>
+
+  <div class="frame" tabindex="0" role="img" aria-label="The yard, animated: four loose wagons, auth.go hunk 1, theme.css, README and auth.go hunk 2, roll in and stop at a red signal while the plan waits for approval. After approval scan and lint pass, the signal turns green and each wagon is switched onto its own train: fix(api): expire old tokens, feat(api): add token refresh, feat(web): add the dark theme, docs(web): explain the theme.">
+  <svg id="yard" viewBox="0 0 1160 430" aria-hidden="true">
+    <defs>
+      <pattern id="ties" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="var(--sleeper)"/></pattern>
+    </defs>
+    <!-- inbound -->
+    <rect x="0" y="212" width="430" height="12" fill="url(#ties)"/>
+    <path class="rail" d="M0 214H430M0 222H430"/>
+    <!-- fan to four trains -->
+    <g class="rail">
+      <path d="M430 214 C520 214,520 64,610 64H1160"/><path d="M430 222 C520 222,520 72,610 72H1160"/>
+      <path d="M430 214 C520 214,520 164,610 164H1160"/><path d="M430 222 C520 222,520 172,610 172H1160"/>
+      <path d="M430 214 C520 214,520 264,610 264H1160"/><path d="M430 222 C520 222,520 272,610 272H1160"/>
+      <path d="M430 214 C520 214,520 364,610 364H1160"/><path d="M430 222 C520 222,520 372,610 372H1160"/>
+    </g>
+    <g fill="url(#ties)"><rect x="610" y="62" width="550" height="12"/><rect x="610" y="162" width="550" height="12"/><rect x="610" y="262" width="550" height="12"/><rect x="610" y="362" width="550" height="12"/></g>
+    <!-- train names -->
+    <g font-size="15" font-weight="700" fill="var(--ink)">
+      <text x="880" y="50">fix(api): expire old tokens</text>
+      <text x="880" y="150">feat(api): add token refresh</text>
+      <text x="880" y="250">feat(web): add the dark theme</text>
+      <text x="880" y="350">docs(web): explain the theme</text>
+    </g>
+    <g id="oks" font-size="13" font-weight="700" fill="var(--green)" opacity="0">
+      <text x="880" y="96">committed</text><text x="880" y="196">committed</text><text x="880" y="296">committed</text><text x="880" y="396">committed</text>
+    </g>
+    <!-- gate signal -->
+    <g transform="translate(400,150)">
+      <rect x="-3" y="0" width="6" height="60" fill="var(--ink)"/>
+      <rect x="-16" y="-44" width="32" height="50" rx="8" fill="var(--ink)"/>
+      <circle id="sig" cx="0" cy="-19" r="10" fill="var(--red)"/>
+    </g>
+    <text id="sigtxt" x="384" y="94" font-size="13" fill="var(--muted)">plan: waiting</text>
+    <!-- plan card -->
+    <g id="plan">
+      <rect x="16" y="16" width="360" height="160" rx="12" fill="var(--paper)" stroke="var(--line)"/>
+      <text x="34" y="44" font-size="13" font-weight="700" fill="var(--ink)">plan</text>
+      <g font-size="12" fill="var(--muted)"><text x="34" y="68">1 fix(api)   auth.go hunk 1</text><text x="34" y="88">2 feat(api)  auth.go hunk 2</text><text x="34" y="108">3 feat(web)  theme.css</text><text x="34" y="128">4 docs(web)  README</text></g>
+      <g id="appr" class="hit"><rect id="apprbg" x="34" y="140" width="120" height="26" rx="6" fill="var(--amber)"/>
+      <text id="apprtx" x="52" y="158" font-size="13" font-weight="700" fill="var(--onwagon)">approve</text></g>
+      <text id="plannote" x="168" y="158" font-size="12" fill="var(--red)">nothing staged yet</text>
+    </g>
+    <!-- wagons: x is set by the script; y is the inbound track -->
+    <g id="wagons" font-size="13" font-weight="700">
+      <g class="wg" data-c="var(--amber)" data-t="auth.go 1" data-y="64"></g>
+      <g class="wg" data-c="var(--green)" data-t="theme.css" data-y="264"></g>
+      <g class="wg" data-c="var(--slate)" data-t="README" data-y="364"></g>
+      <g class="wg" data-c="var(--amber)" data-t="auth.go 2" data-y="164"></g>
+    </g>
+  </svg>
+  </div>
+  <div class="yardctl">
+    <button class="btn solid pulse" id="run" type="button">Approve the plan</button>
+    <button class="btn" id="reset" type="button" disabled>Reset the yard</button>
+    <span class="status" id="yardstat" aria-live="polite">the plan is printed and the yard is waiting for you: nothing is staged until you approve</span>
+  </div>
+</section>
+
+<section class="station wrap reveal" id="hunks" aria-labelledby="h-hunks">
+  <div class="nameboard"><a href="#top">&lt; depot</a><span class="name disp" aria-hidden="true">HUNKS</span><a href="#plan">plan &gt;</a></div>
+  <h2 id="h-hunks" class="disp">Cut at the hunk, not the file</h2>
+  <div class="cols">
+    <div>
+      <p>Real work is tangled: one file holds a bug fix and half a feature. commit-composer splits the working tree into hunks, groups them by project, action and target, and gives every group its own Conventional Commits message.</p>
+      <p>No <code>git add -p</code> sessions, no file-sized compromises. A unit is named by a hash of its file and content, not its line number, so the name survives every commit before it.</p>
+    </div>
+    <div class="frame" style="margin-top:0" tabindex="0" role="img" aria-label="One wagon, auth.go, carries hunk 1 and hunk 2. It uncouples: hunk 1 leaves up for fix(api): expire old tokens and hunk 2 leaves down for feat(api): add token refresh. Each half carries its content hash.">
+      <svg viewBox="0 0 760 300" aria-hidden="true">
+        <rect x="0" y="142" width="760" height="12" fill="url(#ties2)"/>
+        <defs><pattern id="ties2" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="var(--sleeper)"/></pattern></defs>
+        <path class="rail" d="M0 144H300M0 152H300"/>
+        <path class="rail" d="M300 144 C380 144,380 74,460 74H760M300 152 C380 152,380 82,460 82H760"/>
+        <path class="rail" d="M300 144 C380 144,380 214,460 214H760M300 152 C380 152,380 222,460 222H760"/>
+        <rect x="16" y="94" width="232" height="38" rx="6" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="20" y="86" font-size="13" fill="var(--muted)">auth.go</text>
+        <g class="split1"><rect x="24" y="100" width="104" height="32" rx="5" fill="var(--amber)"/><text x="36" y="121" font-size="13" font-weight="700" fill="var(--onwagon)">hunk 1</text><circle cx="44" cy="138" r="5" fill="var(--ink)"/><circle cx="108" cy="138" r="5" fill="var(--ink)"/>
+          <text class="tag" x="24" y="94" font-size="12" fill="var(--amber)">3f9a01c2e4</text></g>
+        <g class="split2"><rect x="136" y="100" width="104" height="32" rx="5" fill="var(--green)"/><text x="148" y="121" font-size="13" font-weight="700" fill="var(--onwagon)">hunk 2</text><circle cx="156" cy="138" r="5" fill="var(--ink)"/><circle cx="220" cy="138" r="5" fill="var(--ink)"/>
+          <text class="tag" x="136" y="160" font-size="12" fill="var(--green)">8be27d0a51</text></g>
+        <g font-size="13" font-weight="700" fill="var(--ink)"><text x="400" y="56">fix(api): expire old tokens</text><text x="400" y="250">feat(api): add token refresh</text></g>
+        <text x="16" y="286" font-size="12" fill="var(--muted)">example ids: a hash of file + content, not a position</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="station wrap reveal" id="plan" aria-labelledby="h-plan">
+  <div class="nameboard"><a href="#hunks">&lt; hunks</a><span class="name disp" aria-hidden="true">PLAN</span><a href="#gates">gates &gt;</a></div>
+  <h2 id="h-plan" class="disp">It always stops at the plan</h2>
+  <div class="cols">
+    <div>
+      <p>Every run takes a snapshot first, lists the hunks, names the project, groups them, prints the plan and then stops. Nothing is staged or committed until you approve the grouping.</p>
+      <ul class="chips" aria-label="Before you approve, you can">
+        <li>regroup</li><li>rename</li><li>drop any group</li>
+      </ul>
+      <p>The title is always <code>type(project): subject</code>.</p>
+    </div>
+    <div class="plan">
+      <ol>
+        <li><b>1</b><span>fix(api): expire old tokens<span class="ids">auth.go hunk 1</span></span></li>
+        <li><b>2</b><span>feat(api): add token refresh<span class="ids">auth.go hunk 2</span></span></li>
+        <li><b>3</b><span>feat(web): add the dark theme<span class="ids">theme.css</span></span></li>
+      </ol>
+      <div class="planfoot">
+        <span class="lamp" id="planlamp" aria-hidden="true"></span>
+        <button class="btn solid" id="approve" type="button" aria-pressed="false">Approve the plan</button>
+        <span class="status" id="planstat" aria-live="polite">waiting: nothing staged</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="station wrap reveal" id="gates" aria-labelledby="h-gates">
+  <div class="nameboard"><a href="#plan">&lt; plan</a><span class="name disp" aria-hidden="true">GATES</span><a href="#skills">two skills &gt;</a></div>
+  <h2 id="h-gates" class="disp">Two signals before every commit</h2>
+  <p><code>scan</code> reads the staged diff for keys and credentials and names the file and the rule, never the value. <code>lint</code> checks the message against the format. Either one prints FAIL, and that commit does not happen. Both print an OK line on a pass.</p>
+  <div class="frame" tabindex="0" role="img" aria-label="A clean wagon passes the green scan and lint signals. Then a wagon carrying a private key file reaches scan, the signal turns red and the wagon stops: FAIL, no commit.">
+    <svg viewBox="0 0 1160 230" aria-hidden="true">
+      <defs><pattern id="ties3" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="var(--sleeper)"/></pattern></defs>
+      <rect x="0" y="152" width="1160" height="12" fill="url(#ties3)"/><path class="rail" d="M0 154H1160M0 162H1160"/>
+      <g transform="translate(460,60)"><rect x="-3" y="0" width="6" height="90" fill="var(--ink)"/><rect x="-16" y="-44" width="32" height="50" rx="8" fill="var(--ink)"/><circle class="sigscan" cx="0" cy="-19" r="10" fill="var(--green)"/><text x="24" y="-12" font-size="14" font-weight="700" fill="var(--ink)">scan</text></g>
+      <g transform="translate(760,60)"><rect x="-3" y="0" width="6" height="90" fill="var(--ink)"/><rect x="-16" y="-44" width="32" height="50" rx="8" fill="var(--ink)"/><circle class="sigl" cx="0" cy="-19" r="10" fill="var(--green)"/><text x="24" y="-12" font-size="14" font-weight="700" fill="var(--ink)">lint</text></g>
+      <g class="clean"><rect x="20" y="114" width="130" height="34" rx="5" fill="var(--green)"/><text x="34" y="136" font-size="13" font-weight="700" fill="var(--onwagon)">feat(web)</text><circle cx="44" cy="150" r="5" fill="var(--ink)"/><circle cx="126" cy="150" r="5" fill="var(--ink)"/></g>
+      <g class="dirty" opacity="0"><rect x="20" y="114" width="130" height="34" rx="5" fill="var(--red)"/><text x="34" y="136" font-size="13" font-weight="700" fill="var(--onwagon)">+ a key file</text><circle cx="44" cy="150" r="5" fill="var(--ink)"/><circle cx="126" cy="150" r="5" fill="var(--ink)"/></g>
+      <text class="failtxt" x="480" y="200" font-size="14" font-weight="700" fill="var(--red)" opacity="0">FAIL: key file, named by rule and file:line, never the value. No commit.</text>
+    </svg>
+  </div>
+  <p class="status">Both gates read patterns. They are a floor, not a verdict: a secret without a rule passes them.</p>
+</section>
+
+<section class="station wrap reveal" id="skills" aria-labelledby="h-skills">
+  <div class="nameboard"><a href="#gates">&lt; gates</a><span class="name disp" aria-hidden="true">TWO SKILLS</span><a href="#terminus">terminus &gt;</a></div>
+  <h2 id="h-skills" class="disp">Pick the train for the job</h2>
+  <div class="tabs" role="tablist" aria-label="Skill">
+    <button role="tab" id="tab-c" aria-controls="pan-c" aria-selected="true">commit-composer</button>
+    <button role="tab" id="tab-m" aria-controls="pan-m" aria-selected="false" tabindex="-1">commit-composer-max</button>
+  </div>
+  <div class="cols">
+    <div>
+      <div role="tabpanel" id="pan-c" aria-labelledby="tab-c">
+        <p><b>Short and meaningful.</b> Commits with short messages a human scans in the log.</p>
+        <pre class="msg"><span class="t">feat(web): add the dark theme</span>
+
+- follows the system setting
+- keeps the light logo readable</pre>
+        <ul class="spec"><li>title aimed at 50 characters</li><li>body optional, 2 to 5 one-line bullets</li><li>checked with lint --concise</li></ul>
+      </div>
+      <div role="tabpanel" id="pan-m" aria-labelledby="tab-m" hidden>
+        <p><b>Audit-grade.</b> A log another agent can audit without reading the code.</p>
+        <pre class="msg"><span class="t">feat(web): add the dark theme</span>
+
+<span class="l">Why:</span>
+- the reason and the goal
+<span class="l">Changes:</span>
+- path: symbol - before, now
+<span class="l">Risk and verification:</span>
+- what ran, what was seen</pre>
+        <ul class="spec"><li>body always, no length limit</li><li>every changed file and symbol named</li><li>checked with lint --max</li></ul>
+      </div>
+    </div>
+    <div class="frame" style="margin-top:0" aria-hidden="true">
+      <svg viewBox="0 0 760 200">
+        <defs><pattern id="ties4" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="var(--sleeper)"/></pattern></defs>
+        <rect x="0" y="132" width="760" height="12" fill="url(#ties4)"/><path class="rail" d="M0 134H760M0 142H760"/>
+        <g id="train"></g>
+        <text id="trainlbl" x="24" y="186" font-size="13" fill="var(--muted)"></text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="station wrap reveal" id="terminus" aria-labelledby="h-term">
+  <div class="nameboard"><a href="#skills">&lt; two skills</a><span class="name disp" aria-hidden="true">TERMINUS</span><a href="#install">install &gt;</a></div>
+  <h2 id="h-term" class="disp">End of the line</h2>
+  <p>Some moves are not on the map. Every run ends with the starting tree id and HEAD id: one restores the index, the other removes the new commits and keeps every change in the working tree.</p>
+  <div class="frame" aria-hidden="true">
+    <svg viewBox="0 0 1160 170">
+      <defs><pattern id="ties5" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="var(--sleeper)"/></pattern></defs>
+      <rect x="0" y="122" width="1080" height="12" fill="url(#ties5)"/><path class="rail" d="M0 124H1080M0 132H1080"/>
+      <g transform="translate(1080,80)"><rect x="0" y="0" width="16" height="56" fill="var(--red)"/><path d="M16 56 L56 56 L16 10Z" fill="var(--slate)"/></g>
+      <g class="arrive">
+        <rect x="760" y="86" width="300" height="34" rx="5" fill="var(--amber)"/>
+        <text x="776" y="108" font-size="13" font-weight="700" fill="var(--onwagon)">your commits, local only</text>
+        <circle cx="790" cy="122" r="5" fill="var(--ink)"/><circle cx="1030" cy="122" r="5" fill="var(--ink)"/>
+      </g>
+      <g class="stoplamp"><circle cx="1088" cy="60" r="10" fill="var(--red)"/></g>
+    </svg>
+  </div>
+  <ul class="never">
+    <li><b>no push</b>yours to run</li>
+    <li><b>no amend</b>no rebase, tag or branch</li>
+    <li><b>no early commit</b>not before you approve the plan</li>
+    <li><b>no commit on FAIL</b>from scan or lint</li>
+    <li><b>no AI trailer</b>no co-author line</li>
+  </ul>
+</section>
+
+<section class="end wrap reveal" id="install" aria-labelledby="h-inst">
+  <h2 id="h-inst" class="disp">All aboard</h2>
+  <div class="cmd"><code id="c2">npx skills add the-khiem7/commit-composer</code><button class="copy" type="button" data-copy="c2">Copy</button></div>
+  <p class="status" style="margin:14px auto">Installs both skills. Add <code>--skill commit-composer</code> for one. Both are explicit entrypoints: call them by name, they never fire on their own.</p>
+  <div class="links"><a href="https://github.com/the-khiem7/commit-composer#readme">Read the README</a><a href="https://github.com/the-khiem7/commit-composer">Source on GitHub</a></div>
+</section>
+</main>
+
+<footer>commit-composer. Messy working tree in, clean single-purpose commits out.</footer>
+<p class="sr" id="live" aria-live="polite"></p>
+
+<script>
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root = document.documentElement, $ = function (id) { return document.getElementById(id); };
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, text) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (text) n.textContent = text; return n; }
+  function wagon(g, color, label, w) {
+    w = w || 100;
+    g.appendChild(el("rect", { x: 0, y: -36, width: w, height: 30, rx: 5, fill: color }));
+    g.appendChild(el("text", { x: 12, y: -16, fill: "var(--onwagon)" }, label));
+    [18, w - 18].forEach(function (cx) { g.appendChild(el("circle", { class: "wheel", cx: cx, cy: -3, r: 5, fill: "var(--ink)" })); });
+  }
+
+  /* theme toggle: starts from the system setting, remembers an override */
+  var tb = $("theme");
+  function isDark() { return root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; }
+  function syncTheme() { var d = isDark(); tb.setAttribute("aria-pressed", d); }
+  tb.onclick = function () { root.dataset.theme = isDark() ? "light" : "dark"; try { localStorage.setItem("cc-theme", root.dataset.theme); } catch (e) {} syncTheme(); };
+  syncTheme();
+
+  /* copy buttons */
+  document.querySelectorAll(".copy").forEach(function (b) {
+    b.onclick = function () {
+      var code = $(b.dataset.copy), txt = code.textContent;
+      function done() { b.textContent = "Copied"; $("live").textContent = "Install command copied"; setTimeout(function () { b.textContent = "Copy"; }, 1600); }
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, sel); else sel();
+      function sel() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); $("live").textContent = "Command selected, press Ctrl+C"; }
+    };
+  });
+
+  /* progress wagon */
+  var bar = document.querySelector(".progress");
+  function prog() { var h = document.documentElement.scrollHeight - innerHeight; bar.style.setProperty("--p", h > 0 ? scrollY / h : 0); }
+  addEventListener("scroll", prog, { passive: true }); prog();
+
+  /* reveals and section animations */
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("live"); io.unobserve(e.target); } });
+  }, { threshold: .15 }) : null;
+  document.querySelectorAll(".reveal").forEach(function (s) { io ? io.observe(s) : s.classList.add("live"); });
+
+  /* the yard: the visitor approves the plan, then the gates pass and every wagon is switched onto its train */
+  var wg = [].slice.call(document.querySelectorAll("#yard .wg"));
+  var HOME = [24, 132, 240, 348], IN = 222, SW = 430, FAN = 610, PARK = 760;
+  wg.forEach(function (g) { wagon(g, g.dataset.c, g.dataset.t); });
+  var timers = [], anims = [], busy = false, runBtn = $("run"), resetBtn = $("reset");
+  function at(ms, f) { timers.push(setTimeout(f, ms)); }
+  function fade(id, o) { $(id).style.transition = "opacity .5s"; $(id).setAttribute("opacity", o); }
+  function setSig(c, t) { $("sig").setAttribute("fill", c); $("sigtxt").textContent = t; }
+  function say(t) { $("yardstat").textContent = t; }
+  function move(g, pts, dur, delay) {
+    var a = g.animate(pts.map(function (p) { return { transform: "translate(" + p[0] + "px," + p[1] + "px)", offset: p[2] }; }),
+      { duration: dur, delay: delay || 0, easing: "ease-in-out", fill: "forwards" });
+    anims.push(a); return a;
+  }
+  function stop() { timers.forEach(clearTimeout); timers = []; anims.forEach(function (a) { a.cancel(); }); anims = []; }
+  function waiting(intro) {
+    stop(); busy = false;
+    setSig("var(--red)", "plan: waiting"); fade("oks", 0); fade("plan", 1);
+    $("apprbg").setAttribute("fill", "var(--amber)"); $("apprtx").textContent = "approve"; $("plannote").textContent = "nothing staged yet";
+    wg.forEach(function (g, i) { move(g, intro ? [[HOME[i] - 520, IN, 0], [HOME[i], IN, 1]] : [[HOME[i], IN, 0], [HOME[i], IN, 1]], intro ? 1500 : 1, intro ? i * 90 : 0); });
+    runBtn.disabled = false; runBtn.classList.add("pulse"); resetBtn.disabled = true;
+    say("the plan is printed and the yard is waiting for you: nothing is staged until you approve");
+  }
+  /* a click is the visitor asking for the motion, so it runs under reduced motion too, only faster */
+  function approve() {
+    if (busy) return; busy = true; var k = reduce ? .35 : 1;
+    runBtn.disabled = true; runBtn.classList.remove("pulse");
+    $("apprbg").setAttribute("fill", "var(--green)"); $("apprtx").textContent = "approved"; $("plannote").textContent = "staging group by group";
+    setSig("var(--amber)", "scan ... lint ..."); say("approved: scan and lint read each group before it commits");
+    at(900 * k, function () { setSig("var(--green)", "scan OK  lint OK"); fade("plan", 0); });
+    [3, 2, 1, 0].forEach(function (i, n) {
+      var y = +wg[i].dataset.y + 8;
+      at((1200 + n * 600) * k, function () { move(wg[i], [[HOME[i], IN, 0], [SW, IN, .35], [FAN, y, .65], [PARK, y, 1]], 1700 * k); });
+    });
+    at((1200 + 3 * 600 + 1700) * k, function () { fade("oks", 1); say("one purpose per train, and nothing pushed"); resetBtn.disabled = false; resetBtn.focus(); });
+  }
+  runBtn.onclick = approve; $("appr").onclick = approve;
+  resetBtn.onclick = function () { waiting(!reduce); runBtn.focus(); };
+  waiting(!reduce);
+
+  /* plan approval toggle */
+  $("approve").onclick = function () {
+    var on = this.getAttribute("aria-pressed") !== "true";
+    this.setAttribute("aria-pressed", on); $("planlamp").classList.toggle("go", on);
+    this.textContent = on ? "Undo approval" : "Approve the plan";
+    $("planstat").textContent = on ? "approved: stage, scan, lint, commit, group by group" : "waiting: nothing staged";
+  };
+
+  /* skills tabs and their trains */
+  var tabs = [].slice.call(document.querySelectorAll("[role=tab]"));
+  function drawTrain(n, label) {
+    var t = $("train"); t.innerHTML = "";
+    var loco = el("g", { transform: "translate(24,138)" }); wagon(loco, "var(--ink)", "title", 90); t.appendChild(loco);
+    for (var i = 0; i < n; i++) { var g = el("g", { transform: "translate(" + (124 + i * 104) + ",138)" }); wagon(g, i % 2 ? "var(--green)" : "var(--amber)", n > 2 ? ["Why:", "Changes:", "Changes:", "Risk:", "verified"][i] : "bullet", 96); t.appendChild(g); }
+    $("trainlbl").textContent = label;
+    if (!reduce) { t.classList.remove("train-in"); void t.getBBox(); t.classList.add("train-in"); }
+  }
+  function sel(tab) {
+    tabs.forEach(function (x) { var on = x === tab; x.setAttribute("aria-selected", on); x.tabIndex = on ? 0 : -1; $(x.getAttribute("aria-controls")).hidden = !on; });
+    tab.id === "tab-m" ? drawTrain(5, "commit-composer-max: the body is always there") : drawTrain(2, "commit-composer: a short train, body optional");
+  }
+  tabs.forEach(function (t, i) {
+    t.onclick = function () { sel(t); };
+    t.onkeydown = function (e) { var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (d) { var n = tabs[(i + d + tabs.length) % tabs.length]; sel(n); n.focus(); } };
+  });
+  sel(tabs[0]);
+})();
+</script>
+</body>
+</html>
