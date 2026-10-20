@@ -1,6 +1,7 @@
 ---
 name: commit-composer
 description: Group the uncommitted changes of a git repository by project, action, and target, at hunk level rather than file level, and commit each group as a short Conventional Commits message with the project name in the title. Use explicitly when the user wants to commit, split a messy working tree into several commits, group changes before committing, or write a concise conventional commit. For a long message that lets an agent audit the task without reading the code, use commit-composer-max.
+version: "1.0.0"
 ---
 
 # Commit Composer

@@ -1,6 +1,7 @@
 ---
 name: commit-composer-max
 description: Group the uncommitted changes of a git repository by project, action, and target, at hunk level, and commit each group with the fullest Conventional Commits message that can be written - the reason, every changed file and symbol, the risks, and what was verified - so another agent can audit a task from the commit message alone without reading the code. Use explicitly when the user wants an audit-grade or exhaustive commit message, a commit log that serves as task evidence, or commits that spare a later agent from reading the diff. For a short message, use commit-composer.
+version: "1.0.0"
 ---
 
 # Commit Composer Max

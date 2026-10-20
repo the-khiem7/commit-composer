@@ -54,9 +54,9 @@ def test_skill_frontmatter(name):
     description = frontmatter.get("description")
     assert isinstance(description, str) and description.strip()
     assert len(description) <= 1024, f"{name}: description is {len(description)} characters"
-    assert "version" not in frontmatter, (
-        f"{name}: the release stamp only reaches baselinedocs-* skills, so a version "
-        "here would never be updated and would go stale"
+    assert re.fullmatch(r"\d+\.\d+\.\d+", str(frontmatter.get("version"))), (
+        f"{name}: version must be a quoted MAJOR.MINOR.PATCH string, written by "
+        "scripts/stamp_version.py"
     )
 
 
@@ -133,6 +133,13 @@ def test_no_dependency_outside_the_skill_folder(name):
         assert "baselinedocs-" not in text, (
             f"{rel(path)} names a baselinedocs skill: a commit skill installs without the family"
         )
+
+
+def test_every_skill_carries_the_same_version():
+    found = {
+        name: split_frontmatter(skill_text(name))[0].get("version") for name in COMMIT_SKILLS
+    }
+    assert len(set(found.values())) == 1, f"skills disagree on version: {found}"
 
 
 def test_each_skill_routes_to_the_other_by_name_only():
