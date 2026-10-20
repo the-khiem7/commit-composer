@@ -5,10 +5,7 @@ import yaml
 
 from helpers import COMMIT_SKILL_NAMES, ROOT, read_text, rel, split_frontmatter
 
-# The `commit-*` skills are not part of the baselinedocs family: `skill_dirs()`
-# never lists them, so the family's metadata, version, and reference tests do not
-# reach them. This file is their whole test surface, and it pins the same things
-# the family tests pin for a baselinedocs skill: the folder shape, the packaged
+# This file is the whole test surface of the two skills: the folder shape, the packaged
 # copies of two canonical files, and the gate sentence in each SKILL.md.
 COMMIT_SKILLS = {
     "commit-composer": "--concise",
