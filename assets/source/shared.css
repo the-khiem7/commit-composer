@@ -1,0 +1,25 @@
+/* Illustration styles for commit-composer: a railway classification yard.
+   Contract with render.py: .item blocks with unique ids inside .sheet, zoom 2,
+   theming through html[data-theme="dark"], --cardline as the image border. */
+
+:root {
+  --paper: #e7e9e4; --ink: #1f2a2e; --muted: #4a565a; --cardline: #c3c8c2;
+  --amber: #9a6200; --green: #2c7a4b; --slate: #5a676c; --red: #b3372b;
+  --rail: #6d7a7f; --sleeper: #b9bfb8; --panel: #f4f5f1; --onwagon: #ffffff;
+}
+html[data-theme="dark"] {
+  --paper: #141a1d; --ink: #e3e8e4; --muted: #a6b1b4; --cardline: #2e383c;
+  --amber: #ffb53d; --green: #5fcf8a; --slate: #8b989c; --red: #ff7a6b;
+  --rail: #7d898e; --sleeper: #2b3438; --panel: #1c2427; --onwagon: #141a1d;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #888; }
+.sheet { width: max-content; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.item {
+  zoom: 2; position: relative; overflow: hidden; width: 1200px;
+  font-family: "JetBrains Mono", monospace; color: var(--ink); background: var(--paper);
+}
+.disp { font-family: "Saira Condensed", sans-serif; font-weight: 800; }
+.btn { width: 240px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.btn .disp { font-size: 30px; letter-spacing: .02em; }

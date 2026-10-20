@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>commit-composer illustrations</title>
+<!-- Source of ../<id>.webp and ../<id>-dark.webp. Render from the repository root with:
+     uvx --from playwright --with pillow python -I <frontdoor-illustrate>/scripts/render.py assets/source/yard.html --root assets --out assets
+     Each .item is 1200 CSS px wide, so 2400 px in the image.
+     Signature note:
+     1. Concept: a railway classification yard; loose wagons (hunks, labelled with the file they carry) roll over the hump and are switched onto tracks, one train per commit.
+     2. Shape language: flat wagons with two wheels, double rails on sleeper pattern, a two-lamp signal mast for the gates; no characters, no perspective.
+     3. Typeface: Saira Condensed 800 for display, JetBrains Mono for every label and commit title.
+     4. Palette logic: slate ground; wagon color is the commit group (amber, green, slate); green lamp = gate passed, red = stop; dark theme raises each accent a step.
+     5. Presentation: wide scenes read left to right, mess on the left, commits on the right; labels are real commit titles in the convention's format, with fictional projects.
+     6. Not: a git-graph of circles and branches, a gradient, a robot or sparkle for the AI.
+     Fonts and grounds printed by render.py: Saira Condensed, JetBrains Mono; light rgb(231, 233, 228), dark rgb(20, 26, 29). -->
+<script src="shared.js"></script>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="sheet">
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="sl" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="10" height="20" fill="var(--sleeper)"/></pattern>
+    <g id="wh"><circle r="7" fill="var(--ink)"/><circle r="2.5" fill="var(--paper)"/></g>
+  </defs>
+</svg>
+
+<!-- HERO -->
+<div class="item" id="hero" style="height:500px">
+<svg width="1200" height="500" viewBox="0 0 1200 500">
+  <text class="disp" x="60" y="104" font-size="88" fill="var(--ink)">commit-composer</text>
+  <text x="62" y="148" font-size="22" font-weight="700" fill="var(--ink)">Messy working tree in. Clean, single-purpose commits out.</text>
+  <rect x="40" y="330" width="420" height="20" fill="url(#sl)"/>
+  <rect x="700" y="250" width="460" height="20" fill="url(#sl)"/><rect x="700" y="330" width="460" height="20" fill="url(#sl)"/><rect x="700" y="410" width="460" height="20" fill="url(#sl)"/>
+  <g stroke="var(--rail)" stroke-width="3" fill="none">
+    <path d="M40 334 H460 C560 334 600 254 700 254 H1160"/><path d="M40 346 H460 C560 346 600 266 700 266 H1160"/>
+    <path d="M460 334 H1160"/><path d="M460 346 H1160"/>
+    <path d="M460 334 C560 334 600 414 700 414 H1160"/><path d="M460 346 C560 346 600 426 700 426 H1160"/>
+  </g>
+  <g font-size="17" font-weight="700" fill="var(--onwagon)">
+    <g transform="translate(50,290)"><rect width="96" height="40" rx="3" fill="var(--slate)"/><text x="10" y="26">README</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
+    <g transform="translate(152,290)"><rect width="96" height="40" rx="3" fill="var(--amber)"/><text x="10" y="26">auth.go</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
+    <g transform="translate(254,290)"><rect width="96" height="40" rx="3" fill="var(--green)"/><text x="10" y="26">theme</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
+    <g transform="translate(356,290)"><rect width="96" height="40" rx="3" fill="var(--amber)"/><text x="10" y="26">auth.go</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
+  </g>
+  <g transform="translate(476,196)"><rect x="-3" y="22" width="6" height="116" fill="var(--ink)"/><rect x="-17" y="-16" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="-3" r="7.5" fill="var(--paper)" opacity=".22"/><circle cy="15" r="7.5" fill="var(--green)"/></g>
+  <text x="502" y="210" font-size="17" font-weight="700" fill="var(--muted)">scan OK  lint OK</text>
+  <g>
+    <g transform="translate(716,210)"><rect width="68" height="40" rx="3" fill="var(--amber)"/><rect x="74" width="68" height="40" rx="3" fill="var(--amber)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/><use href="#wh" x="90" y="44"/><use href="#wh" x="126" y="44"/></g>
+    <g transform="translate(716,290)"><rect width="68" height="40" rx="3" fill="var(--green)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/></g>
+    <g transform="translate(716,370)"><rect width="68" height="40" rx="3" fill="var(--slate)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/></g>
+  </g>
+  <g font-size="18" font-weight="700" fill="var(--ink)"><text x="874" y="238">fix(api): expire old tokens</text><text x="800" y="318">feat(web): add the dark theme</text><text x="800" y="398">docs(web): explain the theme</text></g>
+</svg>
+</div>
+
+<!-- NAV BUTTONS -->
+<div class="item btn" id="nav-how" style="height:56px; width:240px"><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="var(--green)"/></svg><span class="disp">HOW IT WORKS</span></div>
+<div class="item btn" id="nav-skills" style="height:56px; width:240px"><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="var(--amber)"/></svg><span class="disp">TWO SKILLS</span></div>
+<div class="item btn" id="nav-never" style="height:56px; width:240px"><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="var(--red)"/></svg><span class="disp">NEVER DOES</span></div>
+<div class="item btn" id="nav-tech" style="height:56px; width:240px"><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="var(--slate)"/></svg><span class="disp">TECHNICAL</span></div>
+
+<!-- SCENE: one file, two purposes -->
+<div class="item" id="scene-hunks" style="height:420px">
+<svg width="1200" height="420" viewBox="0 0 1200 420">
+  <text class="disp" x="60" y="70" font-size="46" fill="var(--ink)">One file. Two purposes. Two commits.</text>
+  <text x="62" y="106" font-size="18" fill="var(--muted)">File-level tools ship both under one title. commit-composer cuts at the hunk.</text>
+  <!-- the file as one long wagon with two compartments -->
+  <rect x="40" y="250" width="380" height="20" fill="url(#sl)"/>
+  <g stroke="var(--rail)" stroke-width="3" fill="none"><path d="M40 254 H420 C520 254 560 184 660 184 H1160"/><path d="M40 266 H420 C520 266 560 196 660 196 H1160"/><path d="M420 254 C520 254 560 324 660 324 H1160"/><path d="M420 266 C520 266 560 336 660 336 H1160"/></g>
+  <rect x="660" y="180" width="500" height="20" fill="url(#sl)"/><rect x="660" y="320" width="500" height="20" fill="url(#sl)"/>
+  <g transform="translate(70,160)">
+    <rect width="300" height="90" rx="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="2.5"/>
+    <text x="14" y="28" font-size="17" font-weight="700" fill="var(--ink)">auth.go</text>
+    <rect x="14" y="40" width="130" height="38" rx="3" fill="var(--amber)"/><text x="24" y="65" font-size="17" font-weight="700" fill="var(--onwagon)">hunk 1</text>
+    <rect x="156" y="40" width="130" height="38" rx="3" fill="var(--green)"/><text x="166" y="65" font-size="17" font-weight="700" fill="var(--onwagon)">hunk 2</text>
+    <use href="#wh" x="40" y="94"/><use href="#wh" x="260" y="94"/>
+  </g>
+  <g transform="translate(700,138)"><rect width="130" height="40" rx="3" fill="var(--amber)"/><text x="10" y="26" font-size="17" font-weight="700" fill="var(--onwagon)">hunk 1</text><use href="#wh" x="22" y="44"/><use href="#wh" x="108" y="44"/></g>
+  <g transform="translate(700,278)"><rect width="130" height="40" rx="3" fill="var(--green)"/><text x="10" y="26" font-size="17" font-weight="700" fill="var(--onwagon)">hunk 2</text><use href="#wh" x="22" y="44"/><use href="#wh" x="108" y="44"/></g>
+  <g font-size="18" font-weight="700" fill="var(--ink)"><text x="850" y="166">fix(api): expire old tokens</text><text x="850" y="306">feat(api): add token refresh</text></g>
+  <text x="70" y="320" font-size="17" fill="var(--muted)">units are named by a hash of the content,</text>
+  <text x="70" y="344" font-size="17" fill="var(--muted)">so they survive every commit before them</text>
+</svg>
+</div>
+
+<!-- FLOW -->
+<div class="item" id="flow" style="height:640px">
+<svg width="1200" height="640" viewBox="0 0 1200 640">
+  <text class="disp" x="60" y="66" font-size="44" fill="var(--ink)">The line every change runs on</text>
+  <!-- row 1 track -->
+  <g stroke="var(--rail)" stroke-width="4" fill="none"><path d="M80 145 H1120 C1185 145 1185 275 1120 275 H80 C15 275 15 375 80 375 H1120 C1185 375 1185 462 1120 462 H80 C15 462 15 525 80 525 H1120"/></g>
+  <g font-size="17" fill="var(--ink)">
+    <g transform="translate(70,120)"><rect width="220" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">1 snapshot</text></g>
+    <text x="72" y="222" fill="var(--muted)">keep tree id + HEAD id</text>
+    <g transform="translate(330,120)"><rect width="220" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">2 list hunks</text></g>
+    <text x="332" y="222" fill="var(--muted)">commitkit.sh hunks</text>
+    <g transform="translate(590,120)"><rect width="220" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">3 name and group</text></g>
+    <text x="592" y="222" fill="var(--muted)">project, action, target</text>
+    <g transform="translate(850,120)"><rect width="250" height="50" rx="6" fill="var(--panel)" stroke="var(--red)" stroke-width="3"/><text x="14" y="32" font-weight="700">4 print the plan</text></g>
+    <text x="852" y="222" font-weight="700" fill="var(--red)">stop: wait for approval</text>
+    <!-- row 2: per group -->
+    <text x="90" y="330" font-weight="700" fill="var(--ink)">5 for each approved group</text>
+    <g transform="translate(70,350)"><rect width="200" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">reset index</text></g>
+    <g transform="translate(300,350)"><rect width="220" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">patch | apply</text></g>
+    <text x="302" y="428" fill="var(--muted)">git apply --cached</text>
+    <g transform="translate(550,350)"><rect width="160" height="50" rx="6" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/><text x="14" y="32" font-weight="700">scan</text></g>
+    <text x="552" y="428" fill="var(--red)">FAIL: no commit</text>
+    <g transform="translate(740,350)"><rect width="160" height="50" rx="6" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/><text x="14" y="32" font-weight="700">lint</text></g>
+    <text x="742" y="428" fill="var(--red)">FAIL: no commit</text>
+    <g transform="translate(930,350)"><rect width="190" height="50" rx="6" fill="var(--green)"/><text x="14" y="32" font-weight="700" fill="var(--onwagon)">git commit -F</text></g>
+    <text x="932" y="428" fill="var(--muted)">next group</text>
+    <!-- row 3 -->
+    <g transform="translate(330,500)"><rect width="220" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">6 verify</text></g>
+    <text x="332" y="578" fill="var(--muted)">git diff HEAD, git log --stat</text>
+    <g transform="translate(700,500)"><rect width="400" height="50" rx="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">7 report</text></g>
+    <text x="702" y="578" fill="var(--muted)">hashes, leftovers, both undo ids</text>
+  </g>
+  <text x="60" y="618" font-size="17" fill="var(--muted)">never pushes, never amends, never --no-verify</text>
+</svg>
+</div>
+
+<!-- NEVER: a buffer stop with red signals -->
+<div class="item" id="never" style="height:440px">
+<svg width="1200" height="440" viewBox="0 0 1200 440">
+  <text class="disp" x="60" y="70" font-size="44" fill="var(--ink)">End of the line. Some moves are not on the map.</text>
+  <rect x="40" y="356" width="1040" height="20" fill="url(#sl)"/>
+  <g stroke="var(--rail)" stroke-width="3"><path d="M40 360 H1080"/><path d="M40 372 H1080"/></g>
+  <!-- buffer stop -->
+  <g transform="translate(1080,300)"><rect width="22" height="76" fill="var(--red)"/><rect x="-14" y="10" width="14" height="22" rx="4" fill="var(--ink)"/><rect x="-14" y="44" width="14" height="22" rx="4" fill="var(--ink)"/><path d="M22 76 L70 76 L22 20Z" fill="var(--slate)"/></g>
+  <g font-size="17" font-weight="700" fill="var(--ink)">
+    <g transform="translate(110,0)"><rect x="-3" y="190" width="6" height="166" fill="var(--ink)"/><rect x="-17" y="152" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="165" r="7.5" fill="var(--red)"/><circle cy="183" r="7.5" fill="var(--paper)" opacity=".22"/>
+      <text x="-60" y="122">no push</text><text x="-60" y="142" font-weight="500" fill="var(--muted)">yours to run</text></g>
+    <g transform="translate(330,0)"><rect x="-3" y="190" width="6" height="166" fill="var(--ink)"/><rect x="-17" y="152" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="165" r="7.5" fill="var(--red)"/><circle cy="183" r="7.5" fill="var(--paper)" opacity=".22"/>
+      <text x="-90" y="122">no amend, rebase</text><text x="-90" y="142" font-weight="500" fill="var(--muted)">tag or branch</text></g>
+    <g transform="translate(560,0)"><rect x="-3" y="190" width="6" height="166" fill="var(--ink)"/><rect x="-17" y="152" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="165" r="7.5" fill="var(--red)"/><circle cy="183" r="7.5" fill="var(--paper)" opacity=".22"/>
+      <text x="-90" y="122">no commit before</text><text x="-90" y="142" font-weight="500" fill="var(--muted)">you approve the plan</text></g>
+    <g transform="translate(790,0)"><rect x="-3" y="190" width="6" height="166" fill="var(--ink)"/><rect x="-17" y="152" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="165" r="7.5" fill="var(--red)"/><circle cy="183" r="7.5" fill="var(--paper)" opacity=".22"/>
+      <text x="-90" y="122">no commit on FAIL</text><text x="-90" y="142" font-weight="500" fill="var(--muted)">from scan or lint</text></g>
+    <g transform="translate(990,0)"><rect x="-3" y="190" width="6" height="166" fill="var(--ink)"/><rect x="-17" y="152" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="165" r="7.5" fill="var(--red)"/><circle cy="183" r="7.5" fill="var(--paper)" opacity=".22"/>
+      <text x="-80" y="122">no AI trailer</text><text x="-80" y="142" font-weight="500" fill="var(--muted)">no co-author line</text></g>
+  </g>
+  <text x="60" y="414" font-size="17" fill="var(--muted)">every run ends with a tree id and a HEAD id that undo the index and the new commits</text>
+</svg>
+</div>
+
+<!-- TECH: one diff stream, one awk program, two outputs -->
+<div class="item" id="tech-units" style="height:560px">
+<svg width="1200" height="560" viewBox="0 0 1200 560">
+  <text class="disp" x="60" y="66" font-size="44" fill="var(--ink)">One diff stream, one awk program, one id</text>
+  <g font-size="17">
+    <!-- source -->
+    <g transform="translate(60,110)"><rect width="300" height="250" rx="8" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">diff_stream</text>
+      <text x="16" y="70" fill="var(--ink)">git diff -U0 HEAD</text>
+      <text x="16" y="96" fill="var(--muted)">empty tree if no HEAD</text>
+      <text x="16" y="136" fill="var(--ink)">+ each untracked file</text>
+      <text x="16" y="162" fill="var(--muted)">diff --no-index</text>
+      <text x="16" y="188" fill="var(--muted)">/dev/null as new file</text>
+      <text x="16" y="228" fill="var(--muted)">staged or not, all count</text></g>
+    <!-- awk -->
+    <g transform="translate(450,110)"><rect width="300" height="250" rx="8" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">UNITS_AWK</text>
+      <text x="16" y="70" fill="var(--ink)">unit = one -U0 hunk</text>
+      <text x="16" y="96" fill="var(--muted)">or a whole file:</text>
+      <text x="16" y="122" fill="var(--muted)">binary, mode change,</text>
+      <text x="16" y="148" fill="var(--muted)">submodule, empty</text>
+      <text x="16" y="188" fill="var(--ink)">id = hash(file + body)</text>
+      <text x="16" y="214" fill="var(--muted)">twin units get .2, .3</text></g>
+    <!-- outputs -->
+    <g transform="translate(840,110)"><rect width="300" height="110" rx="8" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">hunks</text>
+      <text x="16" y="66" fill="var(--muted)">id, file, kind,</text><text x="16" y="90" fill="var(--muted)">ranges, counts, preview</text></g>
+    <g transform="translate(840,250)"><rect width="300" height="110" rx="8" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">patch &lt;id&gt; ...</text>
+      <text x="16" y="66" fill="var(--muted)">only those units, offsets</text><text x="16" y="90" fill="var(--muted)">recomputed</text></g>
+    <g stroke="var(--rail)" stroke-width="4" fill="none"><path d="M360 235 H450"/><path d="M750 235 C800 235 790 165 840 165"/><path d="M750 235 C800 235 790 305 840 305"/></g>
+    <!-- apply -->
+    <g transform="translate(840,400)"><rect width="300" height="54" rx="8" fill="var(--green)"/><text x="16" y="34" font-weight="700" fill="var(--onwagon)">git apply --cached</text></g>
+    <path d="M990 360 V400" stroke="var(--rail)" stroke-width="4"/>
+    <text x="60" y="410" fill="var(--ink)" font-weight="700">the agent runs every git command that writes</text>
+    <text x="60" y="440" fill="var(--muted)">commitkit.sh only reads and computes</text>
+    <text x="60" y="500" fill="var(--muted)">POSIX sh + POSIX awk: dash and mawk, macOS sh and BWK awk, Git for Windows</text>
+  </g>
+</svg>
+</div>
+
+<div class="item" id="tech-offset" style="height:520px">
+<svg width="1200" height="520" viewBox="0 0 1200 520">
+  <text class="disp" x="60" y="66" font-size="44" fill="var(--ink)">Leave a hunk behind, keep the next one on its line</text>
+  <g font-size="17">
+    <text x="60" y="118" fill="var(--muted)">auth.go has two hunks. Only hunk 2 is in this commit.</text>
+    <!-- full diff -->
+    <g transform="translate(60,150)"><rect width="500" height="230" rx="8" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">the full diff</text>
+      <rect x="16" y="56" width="468" height="54" rx="4" fill="var(--slate)"/><text x="30" y="90" font-weight="700" fill="var(--onwagon)">hunk 1  @@ -10,0 +11,3 @@</text>
+      <rect x="16" y="126" width="468" height="54" rx="4" fill="var(--amber)"/><text x="30" y="160" font-weight="700" fill="var(--onwagon)">hunk 2  @@ -40,2 +43,2 @@</text>
+      <text x="16" y="210" fill="var(--muted)">+43 counts hunk 1's 3 new lines</text></g>
+    <path d="M560 265 H640" stroke="var(--rail)" stroke-width="4"/><path d="M630 255 l12 10 l-12 10" stroke="var(--rail)" stroke-width="4" fill="none"/>
+    <g transform="translate(650,150)"><rect width="490" height="230" rx="8" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">patch, hunk 2 only</text>
+      <rect x="16" y="56" width="458" height="54" rx="4" fill="none" stroke="var(--slate)" stroke-width="2" stroke-dasharray="7 6"/><text x="30" y="90" fill="var(--muted)">hunk 1 left out: shift 0</text>
+      <rect x="16" y="126" width="458" height="54" rx="4" fill="var(--amber)"/><text x="30" y="160" font-weight="700" fill="var(--onwagon)">hunk 2  @@ -40,2 +40,2 @@</text>
+      <text x="16" y="210" fill="var(--muted)">new start = old start + shift</text></g>
+    <text x="60" y="430" fill="var(--ink)" font-weight="700">shift adds new minus old line counts of the selected hunks above</text>
+    <text x="60" y="460" fill="var(--muted)">a pure insertion starts at old + 1, a pure deletion at old - 1</text>
+    <text x="60" y="490" fill="var(--muted)">a start copied from the full diff lands an insertion a line early, and git apply still exits 0</text>
+  </g>
+</svg>
+</div>
+
+<!-- TWO SKILLS -->
+<div class="item" id="skills" style="height:600px">
+<svg width="1200" height="600" viewBox="0 0 1200 600">
+  <text class="disp" x="60" y="66" font-size="44" fill="var(--ink)">Pick the train for the job</text>
+  <!-- short train -->
+  <g transform="translate(60,110)">
+    <rect width="520" height="450" rx="10" fill="var(--panel)" stroke="var(--cardline)" stroke-width="2"/>
+    <text class="disp" x="24" y="52" font-size="34" fill="var(--ink)">commit-composer</text>
+    <text x="24" y="84" font-size="17" fill="var(--muted)">short and meaningful</text>
+    <rect x="24" y="110" width="472" height="150" rx="4" fill="var(--paper)"/>
+    <g font-size="17" fill="var(--ink)"><text x="40" y="146" font-weight="700">feat(web): add the dark theme</text><text x="40" y="190">- follows the system setting</text><text x="40" y="220">- keeps the light logo readable</text></g>
+    <g font-size="17" fill="var(--ink)"><text x="24" y="304">title aimed at 50 characters</text><text x="24" y="334">body optional, 2 to 5 bullets</text><text x="24" y="364">lint --concise</text></g>
+    <g transform="translate(24,410)"><rect width="80" height="18" fill="var(--green)"/><use href="#wh" x="16" y="22"/><use href="#wh" x="64" y="22"/></g>
+  </g>
+  <!-- long train -->
+  <g transform="translate(620,110)">
+    <rect width="520" height="450" rx="10" fill="var(--panel)" stroke="var(--cardline)" stroke-width="2"/>
+    <text class="disp" x="24" y="52" font-size="34" fill="var(--ink)">commit-composer-max</text>
+    <text x="24" y="84" font-size="17" fill="var(--muted)">audit-grade, read instead of the diff</text>
+    <rect x="24" y="110" width="472" height="210" rx="4" fill="var(--paper)"/>
+    <g font-size="17" fill="var(--ink)"><text x="40" y="142" font-weight="700">feat(web): add the dark theme</text>
+      <text x="40" y="176" font-weight="700" fill="var(--amber)">Why:</text><text x="40" y="200">- the reason and the goal</text>
+      <text x="40" y="232" font-weight="700" fill="var(--amber)">Changes:</text><text x="40" y="256">- path: symbol - before, now</text>
+      <text x="40" y="288" font-weight="700" fill="var(--amber)">Risk and verification:</text><text x="40" y="310">- what ran, what was seen</text></g>
+    <g font-size="17" fill="var(--ink)"><text x="24" y="352">body always, no length limit</text><text x="24" y="376">lint --max</text></g>
+    <g transform="translate(24,410)"><rect width="80" height="18" fill="var(--amber)"/><rect x="86" width="80" height="18" fill="var(--amber)"/><rect x="172" width="80" height="18" fill="var(--amber)"/><use href="#wh" x="16" y="22"/><use href="#wh" x="64" y="22"/><use href="#wh" x="102" y="22"/><use href="#wh" x="150" y="22"/><use href="#wh" x="188" y="22"/><use href="#wh" x="236" y="22"/></g>
+  </g>
+</svg>
+</div>
+
+</div>
+</body>
+</html>
