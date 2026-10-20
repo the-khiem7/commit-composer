@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    # packtool.sh claims POSIX sh and awk only: Ubuntu runs it under dash and
+    # mawk, macOS under BWK awk, Windows under Git for Windows sh and gawk.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Run the suite
+        run: uvx --from "pytest>=8,<10" --with pyyaml pytest tests/ -q
