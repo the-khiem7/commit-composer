@@ -378,6 +378,40 @@ def test_lint_allows_a_breaking_change_footer(repo):
     assert out.returncode == 0, out.stdout
 
 
+REFS = "Refs: #200354 https://tracker.example/issues/200354\n"
+
+
+@pytest.mark.parametrize("flag", ["--concise", "--max"])
+def test_lint_allows_ticket_references_as_the_last_paragraph(repo, flag):
+    text = GOOD + "\n" + REFS + "Refs: ABC-12\n\n"
+    out = lint(repo, text, flag)
+    assert out.returncode == 0, out.stdout
+
+
+def test_lint_allows_refs_beside_a_breaking_change_footer(repo):
+    text = "feat(api)!: drop v1\n\n- remove the v1 routes\n\nBREAKING CHANGE: v1 clients must move to v2\n" + REFS
+    assert lint(repo, text).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "feat(billing): add proration\n\n" + REFS + "\n- compute credit from remaining days\n",
+        "feat(billing): add proration\n\n- compute credit from remaining days\n" + REFS,
+        "feat(billing): add proration\n\n" + REFS + "- compute credit from remaining days\n",
+    ],
+)
+def test_lint_fails_a_ticket_reference_that_is_not_the_last_paragraph(repo, text):
+    out = lint(repo, text)
+    assert out.returncode == 1
+    assert "FAIL trailer-not-last" in out.stdout
+
+
+def test_lint_still_rejects_an_attribution_trailer_beside_refs(repo):
+    out = lint(repo, GOOD + "\n" + REFS + "Co-Authored-By: Someone <a@example.com>\n")
+    assert "FAIL ai-trailer" in out.stdout
+
+
 def test_lint_reads_a_crlf_message(repo):
     assert lint(repo, GOOD.replace("\n", "\r\n")).returncode == 0
 

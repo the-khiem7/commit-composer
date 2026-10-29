@@ -285,10 +285,24 @@ case $cmd in
         if (t ~ /\.$/) warn("title-period", 1, "subject ends with a period")
         bullets = 0
         labels = 0
+        refs = 0
+        lastblank = 0
+        # Trailing blank lines do not open a paragraph; git strips them.
+        last = NR
+        while (last > 1 && line[last] == "") last--
+        for (i = 2; i <= last; i++) if (line[i] == "") lastblank = i
         for (i = 2; i <= NR; i++) {
           l = line[i]
           if (i == 2 && l != "") fail("blank-line", 2, "line after the title must be blank")
           if (l == "") continue
+          # A ticket reference is a trailer: the last paragraph holds it, alone or beside BREAKING CHANGE.
+          if (l ~ /^Refs: [^ ]/) {
+            p = line[i - 1]
+            if (i < lastblank || (p != "" && p !~ /^Refs: [^ ]/ && p !~ /^BREAKING CHANGE: [^ ]/)) fail("trailer-not-last", i, "Refs lines form the last paragraph, after a blank line")
+            refs++
+            continue
+          }
+          if (refs && i > lastblank && l !~ /^BREAKING CHANGE: [^ ]/) fail("trailer-not-last", i, "nothing but trailers follows a Refs line")
           if (l ~ /^[ \t]*- [^ ]/) { bullets++; continue }
           if (l ~ /^BREAKING CHANGE: [^ ]/) continue
           if (l ~ /^[A-Za-z][A-Za-z0-9 ,\/()-]*:$/) { labels++; if (mode == "concise") fail("label-in-concise", i, "concise body is flat bullets"); continue }
