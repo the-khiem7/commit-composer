@@ -3,7 +3,7 @@ baseline_schema: "2.0"
 pack: "commit-composer"
 document: "hallucination"
 status: "active"
-updated: "2026-10-20"
+updated: "2026-10-29"
 code_ref: "uncommitted"
 ---
 
@@ -17,6 +17,7 @@ One row per entry. A row states what the entry is about and nothing more. An ans
 |---|---|---|---|
 | CC-D1 | two commit skills committing a working tree at hunk level through a shared convention and a read-only kit | current | CC-D2 |
 | CC-D2 | the skills living in their own repository, reversing the rejected separate-repository option of the origin decision | current | CC-D1 |
+| CC-D3 | an optional tracker-neutral `Refs:` trailer naming the work ticket, taken from the thread, a pack ticket line, or one question | current | CC-D1 |
 
 ## CC-D1: `commit-composer` and `commit-composer-max` commit a working tree at hunk level through a shared convention and a read-only kit
 
@@ -65,3 +66,21 @@ Carried over from the `baselinedocs-skills` pack, where it was recorded as FD-D4
 ## Open questions
 
 No open question is recorded.
+
+## CC-D3: an optional `Refs: <key> <url>` trailer names the work ticket, from the thread, a pack ticket line, or one question in the plan
+
+**Decided.** The convention allows one `Refs:` line per ticket in the last paragraph, beside any `BREAKING CHANGE:` line; `Refs:` and `BREAKING CHANGE:` are the only trailers. The key is the tracker's own identifier verbatim and the URL is optional. The ticket comes from the user or the thread, else from a pack element's `**Ticket:**` line or task `Ticket:` suffix with inheritance from the nearest enclosing heading, else from one question asked in the plan, with `none` the default. The plan shows each group's `Refs:` line and its source. `lint` accepts `^Refs: ` only as the last paragraph and FAILs `trailer-not-last` otherwise; trailing blank lines do not count as a paragraph break; `ai-trailer` is unchanged. The sentence forbidding AI and co-author trailers stays word for word.
+
+**Why.** A user report (2026-10-29): commits for Redmine work had to end with `Refs: #<id> <url>`, and `lint` failed every such message with `body-not-bullet`, so each commit carried a manual override. The trailer form follows the Conventional Commits footer example, so Jira, GitHub Issues and Redmine keys all fit one rule.
+
+**What breaks if ignored.** Every ticket-referencing commit needs a per-commit lint exception, and an agent that learns to ignore one FAIL stops reading the others.
+
+**Accepted cost.** A ticket URL puts the tracker's host name into history; the convention tells a repository published outside the organization to write the key alone, and nothing checks it. `lint` checks the trailer's place, not that the ticket exists or is the right one.
+
+**Found by running the kit on real messages.** The first version failed the three real commits it was written for: `git log --format=%B` ends with a blank line, which the kit read as a paragraph break after the trailer. Trailing blank lines are now ignored, and a test case carries one.
+
+**Rejected: any `Token: value` trailer.** Lets a stray or attribution-like trailer through, which the AI-trailer rule exists to stop.
+
+**Rejected: a tracker-specific key such as `Redmine:` or `Jira:`.** A second rule per tracker for the same meaning.
+
+**Rejected: the ticket in the title.** Spends the 50 to 72 characters the subject needs, and a tracker key is not the effect of the change.

@@ -3,7 +3,7 @@ baseline_schema: "2.0"
 pack: "commit-composer"
 document: "introduction"
 status: "active"
-updated: "2026-10-20"
+updated: "2026-10-29"
 code_ref: "uncommitted"
 ---
 
@@ -27,6 +27,7 @@ Out of scope, and owned elsewhere:
 | skills | `commit-composer` (short message, `lint --concise`) and `commit-composer-max` (audit-grade message, `lint --max`). Both `allow_implicit_invocation: false` |
 | shared assets | byte-identical copies of `contract/commit-convention.md` and `contract/commitkit.sh` in each skill folder. Pinned by `tests/test_commit_skills.py` |
 | kit | `commitkit.sh`: `hunks`, `patch`, `scan`, `lint`. POSIX sh and awk, computes and never writes. Tested by `tests/test_commitkit.py` |
+| work ticket | optional `Refs: <key> <url>` trailer, from the thread, a pack `**Ticket:**` line, or one question in the plan; `lint` FAILs `trailer-not-last`. CC-D3 |
 | version | one top-level `version:` in each `SKILL.md`, one value for both, stamped by `scripts/release.py`. Initial value `1.0.0`. CC-D2 |
 | origin | split from the `baselinedocs-skills` repository with `git filter-repo`; history of the moved paths preserved. CC-D2 |
 | not observed | a host selecting either skill from a plain request; mawk and BWK awk running `commitkit.sh`; `.github/workflows/tests.yml` on three operating systems |
