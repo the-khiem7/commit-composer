@@ -41,4 +41,4 @@ Run `sh <skill-dir>/scripts/commitkit.sh scan` on the staged diff before every c
 
 - not a push, amend, rebase, tag, or branch tool
 - does not write the short message; `commit-composer` does
-- does not read or write a baseline pack beyond the frontmatter and path mentions needed to name a project
+- does not read or write a baseline pack beyond the frontmatter, path mentions, and work ticket lines needed to name a project and its ticket
