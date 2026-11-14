@@ -28,7 +28,7 @@ Refs: <ticket key> <ticket url>
 | `chore` | maintenance that fits nothing else, such as reworded user-facing copy with no defect stated |
 | `style` | formatting only |
 | `revert` | undoing an earlier commit |
-- `<project>` is always present, even in a repository with one project. A commit never mixes two projects.
+- `<project>` is always present, even in a repository with one project. A commit never mixes two projects, except the initiative case under Grouping.
 - `<subject>` is imperative, starts lowercase, has no final period, and names the effect rather than the files.
 - The title has no length limit. The line after it is blank.
 - Every body line is a bullet, or in a message that allows it a label line ending with a colon. One bullet is one line however long: never wrap, never continue a bullet on a second line.
@@ -68,6 +68,7 @@ Never invent a ticket, and never take one from a branch name or an earlier commi
 ## Grouping
 
 - The project is a hard boundary. Within a project, group by action (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`), then by target: the same component, feature, or defect.
+- Initiative exception: units that are all baseline pack documents, of packs listed under one initiative index, with the same action and the same target (for example repointing links after a file is removed), may share one commit whose project is the initiative index pack's name. The plan says so and the user approves it. A unit that is code, or belongs to another initiative, keeps the hard boundary.
 - A unit is one contiguous changed region, or a whole file that cannot be split (binary, mode change, submodule, empty file). The kit cannot split a unit further. A unit that serves two purposes goes with the dominant one, and the plan says so.
 - A whitespace-only or formatting-only unit that sits beside code the same group changes goes with that group; on its own it forms a `style` group.
 - A test unit goes with the change it tests unless the user asked for tests separately. A unit that serves two groups goes with the one whose behavior it exercises most, and that group is committed after the other so every symbol the unit names already exists.
