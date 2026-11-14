@@ -352,7 +352,6 @@ def test_lint_accepts_a_title_only_message_in_default_mode(repo):
         ("add proration\n", "title-format"),
         ("feat: add proration\n", "title-format"),
         ("feature(billing): add proration\n", "title-format"),
-        ("feat(billing): " + "x" * 70 + "\n", "title-length"),
         ("feat(billing): add proration\nbody right away\n", "blank-line"),
         ("feat(billing): add proration\n\nplain sentence\n", "body-not-bullet"),
         ("feat(billing): add proration\n\n- one bullet that\n  wraps onto a second line\n", "body-not-bullet"),
@@ -425,6 +424,12 @@ def test_lint_concise_rejects_more_than_five_bullets(repo):
     body = "".join(f"- b{n}\n" for n in range(6))
     out = lint(repo, "fix(api): x\n\n" + body, "--concise")
     assert "FAIL too-many-bullets" in out.stdout
+
+
+@pytest.mark.parametrize("flag", ["--concise", "--max"])
+def test_lint_sets_no_upper_limit_on_the_title(repo, flag):
+    out = lint(repo, "fix(api): " + "x" * 150 + "\n\n- one\n", flag)
+    assert out.returncode == 0, out.stdout
 
 
 def test_lint_concise_warns_past_fifty_characters(repo):

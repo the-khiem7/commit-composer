@@ -280,8 +280,7 @@ case $cmd in
         if (NR == 0 || line[1] == "") { fail("empty-message", 1, "no title"); exit 1 }
         t = line[1]
         if (t !~ /^(feat|fix|refactor|perf|docs|test|build|ci|chore|style|revert)\([A-Za-z0-9._\/-]+\)!?: [^ ]/) fail("title-format", 1, "expected type(project): subject")
-        if (length(t) > 72) fail("title-length", 1, length(t) " characters, limit 72")
-        else if (mode == "concise" && length(t) > 50) warn("title-length", 1, length(t) " characters, target 50")
+        if (mode == "concise" && length(t) > 50) warn("title-length", 1, length(t) " characters, target 50")
         if (t ~ /\.$/) warn("title-period", 1, "subject ends with a period")
         bullets = 0
         labels = 0

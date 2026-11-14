@@ -85,7 +85,7 @@ A unit id is a hash of its file and content, not its position. Line numbers move
 |---|---|
 | `scan`, file names | private key files (`.pem`, `.key`, `.p12`, `.pfx`, `.jks`, `.ppk`, `id_rsa` and kin), Terraform state, `.env` files other than examples and templates, an AWS credentials file |
 | `scan`, added lines | a private key block, an AWS access key id, an AWS secret access key, a quoted password, secret, token, or API key assignment that is not a placeholder |
-| `lint`, title | `type(project): subject` with one of eleven types, at most 72 characters; WARN over 50 in `--concise` and on a final period |
+| `lint`, title | `type(project): subject` with one of eleven types, no length limit; WARN over 50 in `--concise` and on a final period |
 | `lint`, body | a blank second line, every line a bullet or a label ending in a colon; `--concise` allows no labels and at most 5 bullets, `--max` needs at least one bullet |
 | `lint`, anywhere | no en or em dash, no pack identifier, phase number, pack path, or pack filename, no AI or co-author trailer; WARN on a reference to another commit by position and on vague words in `--max` |
 

@@ -14,7 +14,7 @@ Run `sh <skill-dir>/scripts/commitkit.sh scan` on the staged diff before every c
 
 ## Message shape
 
-- Title: `type(project): subject`, never over 72 characters.
+- Title: `type(project): subject`, no length limit.
 - Body: always present, no length limit, in three labelled blocks in this order. Each label line ends with a colon and is followed by bullets, one line per bullet. Leave a block out when nothing applies to it; never write `N/A`.
   - `Why:` the reason and the goal, and the problem this commit solves apart from the rest of the work.
   - `Changes:` one bullet per file or symbol touched, as `path: symbol - what it did before and what it does now`, with exact names, values, paths, and units.

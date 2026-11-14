@@ -14,7 +14,7 @@ Run `sh <skill-dir>/scripts/commitkit.sh scan` on the staged diff before every c
 
 ## Message shape
 
-- Title: `type(project): subject`, aim for 50 characters, never over 72.
+- Title: `type(project): subject`, aim for 50 characters.
 - Body: leave it out when the title says enough. When the reason is not obvious from the title, add 2 to 5 bullets, each one line, each a single fact, saying why and not what the diff shows. No label lines.
 
 ## Rules

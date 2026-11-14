@@ -30,7 +30,7 @@ Refs: <ticket key> <ticket url>
 | `revert` | undoing an earlier commit |
 - `<project>` is always present, even in a repository with one project. A commit never mixes two projects.
 - `<subject>` is imperative, starts lowercase, has no final period, and names the effect rather than the files.
-- The title is at most 72 characters. The line after it is blank.
+- The title has no length limit. The line after it is blank.
 - Every body line is a bullet, or in a message that allows it a label line ending with a colon. One bullet is one line however long: never wrap, never continue a bullet on a second line.
 - Never refer to another commit by position (`previous`, `just before`, `the next one`): the order is settled while committing and a message cannot see it. Name what that commit changed.
 - ASCII hyphen only. No en dash, no em dash.
