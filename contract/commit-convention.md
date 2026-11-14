@@ -84,9 +84,9 @@ Never invent a ticket, and never take one from a branch name or an earlier commi
    1. `git reset -q` (index only; the working tree is untouched).
    2. `commitkit.sh hunks` again. Unit ids survive a commit; line numbers do not.
    3. `commitkit.sh patch <id> ...` piped into `git apply --cached --unidiff-zero`, then `git diff --cached --stat` to confirm only this group is staged.
-   4. `commitkit.sh scan`. Never commit while it prints FAIL: remove the finding from the group or stop and tell the user. It prints a file and a rule, never the value; do not go and print the value yourself.
-   5. Write the message to a temporary file in the operating system's temp folder, not inside the repository or its `.git`, and run `commitkit.sh lint <mode flag> <file>`. Fix every FAIL before committing; judge every WARN. `scan` and `lint` each print an `OK` line on a pass; no `OK` and no FAIL means it did not run.
-   6. `git commit -F <file>`. Never `--no-verify`, `--amend`, or push.
+   4. `commitkit.sh scan`. Never commit while it prints FAIL: remove the finding from the group or stop and tell the user. It prints a file and a rule, never the value; do not go and print the value yourself. Run `scan` and `lint` bare, never through a pipe such as `tail`, `head`, `grep`, or `tee`: a pipeline returns the status of its last command, which hides the exit 1 a FAIL gives and lets the commit run.
+   5. Write the message to a temporary file in the operating system's temp folder, not inside the repository or its `.git`. Use the host's file-writing tool, not a shell heredoc: an apostrophe or a backtick in a long message can break a heredoc under some shell wrappers and cost a retry. Then run `commitkit.sh lint <mode flag> <file>`. Fix every FAIL before committing; judge every WARN. `scan` and `lint` each print an `OK` line on a pass; no `OK` and no FAIL means it did not run.
+   6. Commit with the checks chained in front, so a FAIL stops the commit without anyone reading the output: `sh commitkit.sh scan && sh commitkit.sh lint <mode flag> <file> && git commit -F <file>`. Never `--no-verify`, `--amend`, or push.
 6. Verify. `git diff HEAD` holds only the units the user dropped, and `git log --stat` shows each commit with the files it should hold. Delete every temporary file.
 7. Report: each commit's short hash and title, the units left uncommitted, and the two ids from step 1 with what each undoes. When a step fails midway, leave the state as it is, report what was committed and what was not, and stop. Never retry or roll back on your own.
 
