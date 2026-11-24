@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>commit-composer illustrations</title>
-<!-- Source of ../<id>.webp and ../<id>-dark.webp. Render from the repository root with:
+<!-- Source of ../<id>.webp and ../<id>-dark.webp (banner-social is a PNG). Render from the repository root with:
      uvx --from playwright --with pillow python -I <frontdoor-illustrate>/scripts/render.py assets/source/yard.html --root assets --out assets
      Each .item is 1200 CSS px wide, so 2400 px in the image.
+     Animated banner (replaces the still banner.webp and banner-dark.webp):
+     uvx --from playwright --with pillow python -I <frontdoor-readme>/scripts/animate.py assets/source/yard.html --root assets --item banner --call "drawBanner({v})" --name banner --motion loop --frames 80 --out assets
      Signature note:
      1. Concept: a railway classification yard; loose wagons (hunks, labelled with the file they carry) roll over the hump and are switched onto tracks, one train per commit.
      2. Shape language: flat wagons with two wheels, double rails on sleeper pattern, a two-lamp signal mast for the gates; no characters, no perspective.
@@ -28,8 +30,8 @@
   </defs>
 </svg>
 
-<!-- HERO -->
-<div class="item" id="hero" style="height:500px">
+<!-- BANNER -->
+<div class="item" id="banner" style="height:500px">
 <svg width="1200" height="500" viewBox="0 0 1200 500">
   <text class="disp" x="60" y="104" font-size="88" fill="var(--ink)">commit-composer</text>
   <text x="62" y="148" font-size="22" font-weight="700" fill="var(--ink)">Messy working tree in. Clean, single-purpose commits out.</text>
@@ -40,20 +42,25 @@
     <path d="M460 334 H1160"/><path d="M460 346 H1160"/>
     <path d="M460 334 C560 334 600 414 700 414 H1160"/><path d="M460 346 C560 346 600 426 700 426 H1160"/>
   </g>
+  <g class="still">
   <g font-size="17" font-weight="700" fill="var(--onwagon)">
     <g transform="translate(50,290)"><rect width="96" height="40" rx="3" fill="var(--slate)"/><text x="10" y="26">README</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
     <g transform="translate(152,290)"><rect width="96" height="40" rx="3" fill="var(--amber)"/><text x="10" y="26">auth.go</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
     <g transform="translate(254,290)"><rect width="96" height="40" rx="3" fill="var(--green)"/><text x="10" y="26">theme</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
     <g transform="translate(356,290)"><rect width="96" height="40" rx="3" fill="var(--amber)"/><text x="10" y="26">auth.go</text><use href="#wh" x="20" y="44"/><use href="#wh" x="76" y="44"/></g>
   </g>
+  </g>
   <g transform="translate(476,196)"><rect x="-3" y="22" width="6" height="116" fill="var(--ink)"/><rect x="-17" y="-16" width="34" height="44" rx="9" fill="var(--ink)"/><circle cy="-3" r="7.5" fill="var(--paper)" opacity=".22"/><circle cy="15" r="7.5" fill="var(--green)"/></g>
   <text x="502" y="210" font-size="17" font-weight="700" fill="var(--muted)">scan OK  lint OK</text>
+  <g class="still">
   <g>
     <g transform="translate(716,210)"><rect width="68" height="40" rx="3" fill="var(--amber)"/><rect x="74" width="68" height="40" rx="3" fill="var(--amber)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/><use href="#wh" x="90" y="44"/><use href="#wh" x="126" y="44"/></g>
     <g transform="translate(716,290)"><rect width="68" height="40" rx="3" fill="var(--green)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/></g>
     <g transform="translate(716,370)"><rect width="68" height="40" rx="3" fill="var(--slate)"/><use href="#wh" x="16" y="44"/><use href="#wh" x="52" y="44"/></g>
   </g>
   <g font-size="18" font-weight="700" fill="var(--ink)"><text x="874" y="238">fix(api): expire old tokens</text><text x="800" y="318">feat(web): add the dark theme</text><text x="800" y="398">docs(web): explain the theme</text></g>
+  </g>
+  <g id="anim" font-size="17" font-weight="700"></g>
 </svg>
 </div>
 
@@ -247,5 +254,73 @@
 </div>
 
 </div>
-</body>
+<script>
+/* Animated banner for the README (assets/banner.webp, banner-dark.webp, animated WebP). animate.py calls drawBanner once per frame, in order, and the
+   page keeps its own frame counter, so the loop is one pass of the wagons through the yard instead of a sine sway.
+   Without a call the page shows the still banner. */
+(function () {
+  var FRAMES = 80, frame = 0, table = {};
+  var TRACKS = {
+    top: "M0 334 H460 C560 334 600 254 700 254 H1200",
+    mid: "M0 334 H1200",
+    bot: "M0 334 H460 C560 334 600 414 700 414 H1200"
+  };
+  var WAGONS = [
+    { label: "auth.go", color: "--amber", from: 404, to: 824, track: "top", delay: 0 },
+    { label: "theme", color: "--green", from: 302, to: 750, track: "mid", delay: 0.03 },
+    { label: "auth.go", color: "--amber", from: 200, to: 750, track: "top", delay: 0.06 },
+    { label: "README", color: "--slate", from: 98, to: 750, track: "bot", delay: 0.09 }
+  ];
+  var TITLES = [
+    { x: 874, y: 238, text: "fix(api): expire old tokens" },
+    { x: 800, y: 318, text: "feat(web): add the dark theme" },
+    { x: 800, y: 398, text: "docs(web): explain the theme" }
+  ];
+  function build(name) {
+    var ns = "http://www.w3.org/2000/svg", path = document.createElementNS(ns, "path");
+    path.setAttribute("d", TRACKS[name]);
+    var len = path.getTotalLength(), pts = [];
+    for (var i = 0; i <= 400; i++) { var q = path.getPointAtLength(len * i / 400); pts.push([q.x, q.y]); }
+    table[name] = pts;
+  }
+  function yAt(name, x) {
+    if (!table[name]) build(name);
+    var pts = table[name];
+    for (var i = 1; i < pts.length; i++) {
+      if (pts[i][0] >= x) { var a = pts[i - 1], b = pts[i], k = b[0] === a[0] ? 0 : (x - a[0]) / (b[0] - a[0]); return a[1] + (b[1] - a[1]) * k; }
+    }
+    return pts[pts.length - 1][1];
+  }
+  function ease(u) { u = Math.max(0, Math.min(1, u)); return u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; }
+  function clamp(x) { return Math.max(0, Math.min(1, x)); }
+  function wagon(cx, y, label, color, labelOpacity, o) {
+    var k = clamp((cx - 440) / 120), w = 96 - 28 * k, left = cx - w / 2, top = y - 44;
+    var x1 = 20 - 4 * k, x2 = 76 - 24 * k;
+    return '<g transform="translate(' + left.toFixed(1) + ',' + top.toFixed(1) + ')" opacity="' + o.toFixed(2) + '">' +
+      '<rect width="' + w.toFixed(1) + '" height="40" rx="3" fill="var(' + color + ')"/>' +
+      (labelOpacity > 0 ? '<text x="10" y="26" font-size="17" fill="var(--onwagon)" opacity="' + labelOpacity.toFixed(2) + '">' + label + '</text>' : '') +
+      '<use href="#wh" x="' + x1.toFixed(1) + '" y="44"/><use href="#wh" x="' + x2.toFixed(1) + '" y="44"/></g>';
+  }
+  window.drawBanner = function () {
+    var T = (frame++ % FRAMES) / FRAMES, f = clamp((T - 0.92) / 0.08), out = "";
+    var fin = T >= 0.92 ? 1 - f : 1, start = T >= 0.92 ? f : 1;
+    WAGONS.forEach(function (w) {
+      var u = ease((T - 0.12 - w.delay) / 0.4), cx = w.from + (w.to - w.from) * u;
+      var lab = clamp(1 - (cx - w.from - 40) / 60);
+      if (T < 0.92) out += wagon(cx, yAt(w.track, cx), w.label, w.color, w.label ? lab : 0, 1);
+      else {
+        out += wagon(w.to, yAt(w.track, w.to), w.label, w.color, 0, fin);
+        out += wagon(w.from, 334, w.label, w.color, 1, start);
+      }
+    });
+    var ti = T >= 0.92 ? 1 - f : 1;
+    TITLES.forEach(function (t, i) {
+      var o = clamp((T - 0.62 - i * 0.04) / 0.06) * ti;
+      if (o > 0) out += '<text x="' + t.x + '" y="' + t.y + '" font-size="18" fill="var(--ink)" opacity="' + o.toFixed(2) + '">' + t.text + '</text>';
+    });
+    document.getElementById("anim").innerHTML = out;
+    document.querySelectorAll("#banner .still").forEach(function (g) { g.setAttribute("display", "none"); });
+  };
+})();
+</script></body>
 </html>
