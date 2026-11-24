@@ -300,6 +300,48 @@ def test_scan_flags_a_literal_credential_assignment(repo):
     assert FAKE_VALUE not in out.stdout
 
 
+@pytest.mark.parametrize(
+    "name",
+    [
+        "tests/test_app.py",
+        "src/app_test.go",
+        "web/login.spec.ts",
+        "infra/stack.tftest.hcl",
+        "tests/fixtures/app.cfg",
+        "test_helpers.py",
+    ],
+)
+def test_scan_warns_not_fails_a_credential_assignment_in_a_test_file(repo, name):
+    stage_file(repo, name, f'{CREDENTIAL_NAME} = "{FAKE_VALUE}"\n')
+    out = kit(repo, "scan")
+    assert out.returncode == 0, out.stdout
+    assert f"WARN credential-assignment-in-test-file {name}:1" in out.stdout
+    assert not [line for line in out.stdout.splitlines() if line.startswith("FAIL ")]
+    assert out.stdout.splitlines()[-1].startswith("OK scan: no FAIL findings; 1 WARN")
+    assert FAKE_VALUE not in out.stdout
+
+
+def test_scan_still_fails_a_private_key_block_in_a_test_file(repo):
+    stage_file(repo, "tests/key_fixture.txt", f"{PRIVATE_KEY_HEADER}\nMIIB\n")
+    out = kit(repo, "scan")
+    assert out.returncode == 1
+    assert "FAIL private-key-block tests/key_fixture.txt:1" in out.stdout
+
+
+def test_scan_still_fails_an_access_key_id_in_a_test_file(repo):
+    stage_file(repo, "tests/ids.txt", f"id = {ACCESS_KEY_ID}\n")
+    out = kit(repo, "scan")
+    assert out.returncode == 1
+    assert "FAIL aws-access-key-id tests/ids.txt:1" in out.stdout
+
+
+def test_scan_fails_a_credential_assignment_beside_a_test_file_name(repo):
+    stage_file(repo, "src/latest.cfg", f'{CREDENTIAL_NAME} = "{FAKE_VALUE}"\n')
+    out = kit(repo, "scan")
+    assert out.returncode == 1
+    assert "FAIL credential-assignment src/latest.cfg:1" in out.stdout
+
+
 def test_scan_ignores_a_placeholder_credential(repo):
     stage_file(repo, "app.cfg", f'{CREDENTIAL_NAME} = "<DB_VALUE>"\n{KEY_NAME} = "changeme"\n')
     assert kit(repo, "scan").returncode == 0

@@ -9,7 +9,7 @@
 #
 #   sh commitkit.sh hunks                       every change unit of HEAD versus the working tree
 #   sh commitkit.sh patch <id> [<id> ...]       a patch holding only those units, for git apply --cached --unidiff-zero
-#   sh commitkit.sh scan                        FAIL findings in the staged diff, by file:line and rule, never the value
+#   sh commitkit.sh scan                        FAIL findings in the staged diff, by file:line and rule, never the value; a quoted-value assignment to a secret-like name inside a test file is a WARN
 #   sh commitkit.sh lint [--concise|--max] <msgfile>   FAIL and WARN findings in a commit message
 #
 # A unit is one -U0 hunk, or a whole file when the file cannot be split: a
@@ -235,7 +235,7 @@ case $cmd in
         END { exit fail }
       ' || status=1
     fi
-    git -c core.quotepath=false diff --cached --no-color --no-ext-diff --no-renames -U0 | $AWK '
+    findings="$(git -c core.quotepath=false diff --cached --no-color --no-ext-diff --no-renames -U0 | $AWK '
       BEGIN {
         akid = "(AKIA|ASIA)"
         for (i = 0; i < 16; i++) akid = akid "[0-9A-Z]"
@@ -251,13 +251,27 @@ case $cmd in
         else if (line ~ akid) rule = "aws-access-key-id"
         else if (low ~ /aws_secret_access_key[ \t]*[=:]/) rule = "aws-secret-access-key"
         else if (low ~ /(password|passwd|secret|token|api[_-]?key)[a-z0-9_]*["\047]?[ \t]*[=:][ \t]*["\047][^"\047 \t]+["\047]/ && low !~ /(example|placeholder|changeme|<[a-z_ -]+>|\$\{|xxxx|your[_-])/) rule = "credential-assignment"
-        if (rule != "") { printf "FAIL %s %s:%d\n", rule, f, ln; fail = 1 }
+        # A quoted value next to a secret-looking name is how a test fixture mocks one, so in
+        # a test file this one rule is a WARN: the line is still named, but the scan passes.
+        # A key block or an access key id stays a FAIL in a test file too.
+        intest = (f ~ /(^|\/)(tests?|__tests__|spec)\// || f ~ /(^|\/)test_[^\/]*$/ || f ~ /(_test|\.test|_spec|\.spec)\.[^\/]*$/ || f ~ /\.tftest\.(hcl|json)$/)
+        if (rule == "credential-assignment" && intest) {
+          printf "WARN credential-assignment-in-test-file %s:%d\n", f, ln
+        } else if (rule != "") { printf "FAIL %s %s:%d\n", rule, f, ln; fail = 1 }
         ln++
       }
       END { exit fail }
-    ' || status=1
+    ')" || status=1
+    [ -z "$findings" ] || printf '%s\n' "$findings"
+    warns=$(printf '%s\n' "$findings" | grep -c '^WARN ' || true)
     # A pass prints a line: silence is indistinguishable from a scan that never ran.
-    [ $status -eq 0 ] && echo "OK scan: no findings in the staged diff"
+    if [ $status -eq 0 ]; then
+      if [ "$warns" -eq 0 ]; then
+        echo "OK scan: no findings in the staged diff"
+      else
+        echo "OK scan: no FAIL findings; $warns WARN in test files, read each named line before committing"
+      fi
+    fi
     exit $status
     ;;
   lint)
