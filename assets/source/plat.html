@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>commit-composer illustrations</title>
+<!-- Source of ../<id>.webp and ../<id>-dark.webp (banner-social is a PNG). Render from the repository root with:
+     uvx --from playwright --with pillow python -I <frontdoor-illustrate>/scripts/render.py assets/source/plat.html --root assets --out assets
+     Each .item is 1200 CSS px wide, so 2400 px in the image.
+     Animated banner (replaces the still banner.webp and banner-dark.webp; run after the command above):
+     uvx --from playwright --with pillow python -I <frontdoor-readme>/scripts/animate.py assets/source/plat.html --root assets --item banner --call "drawBanner({v})" --name banner --motion sway --amp 9 --frames 30 --size 1800x765 --quality 55 --out assets
+     Signature note:
+     1. Concept: a subdivision plat. One parcel is divided into lots, each lot is recorded under its own title, and nothing is recorded until the plan is signed.
+     2. Shape language: irregular parcel outlines with dashed lot lines, hollow survey monuments at the corners, hatch fills that name the lot (fix a rising slash in teal, feat a falling slash in ochre, docs vertical bars in vermilion), a bordered title block with a signature line; no characters, no perspective.
+     3. Typeface: Bricolage Grotesque 800 for display, Fragment Mono for every label and commit title.
+     4. Palette logic: survey navy ink on bone paper; teal, ochre and vermilion are the three lots and keep their hatch in every picture; green only for a passed gate; the dark theme is a night survey sheet with each lot raised one step.
+     5. Presentation: one parcel on the left, the schedule and the title block on the right; labels are real commit titles in the convention's format with fictional projects, and the real OK lines of the kit.
+     6. Not: a blueprint cliche, a map pin, a railway, a git graph of circles, a gradient.
+     Fonts and grounds printed by render.py: Bricolage Grotesque, Fragment Mono; light rgb(235, 233, 224), dark rgb(12, 22, 32). -->
+<script src="shared.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800&family=Fragment+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="sheet">
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="h1" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="var(--l1)" opacity=".16"/><rect width="2" height="9" fill="var(--l1)" opacity=".75"/></pattern>
+    <pattern id="h2" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="9" height="9" fill="var(--l2)" opacity=".16"/><rect width="2" height="9" fill="var(--l2)" opacity=".8"/></pattern>
+    <pattern id="h3" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="var(--l3)" opacity=".16"/><rect width="2" height="9" fill="var(--l3)" opacity=".75"/></pattern>
+    <pattern id="hn" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="var(--muted)" opacity=".10"/><rect width="1.5" height="9" fill="var(--muted)" opacity=".5"/></pattern>
+    <g id="mon"><circle r="6" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.2"/></g>
+    <marker id="arr" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="var(--ink)" stroke-width="2"/></marker>
+  </defs>
+</svg>
+
+<!-- BANNER: animated, the lot lines sway a few pixels and back (drawBanner(v)) -->
+<div class="item" id="banner" style="height:510px">
+<svg width="1200" height="510" viewBox="0 0 1200 510">
+  <defs><clipPath id="parcel"><polygon points="60,238 330,196 700,212 762,336 690,452 300,444 80,404"/></clipPath></defs>
+  <text class="nm" x="58" y="96" font-size="66" fill="var(--ink)" letter-spacing="-1.5">commit-composer</text>
+  <text x="60" y="140" font-size="19" font-weight="700" fill="var(--ink)">Messy working tree in. Clean, single-purpose commits out.</text>
+  <g id="lots" clip-path="url(#parcel)"></g>
+  <polygon points="60,238 330,196 700,212 762,336 690,452 300,444 80,404" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+  <g id="lines" stroke="var(--ink)" stroke-width="2" stroke-dasharray="9 6" fill="none" clip-path="url(#parcel)"></g>
+  <g>
+    <use href="#mon" x="60" y="238"/><use href="#mon" x="330" y="196"/><use href="#mon" x="700" y="212"/><use href="#mon" x="762" y="336"/><use href="#mon" x="690" y="452"/><use href="#mon" x="300" y="444"/><use href="#mon" x="80" y="404"/>
+  </g>
+  <g font-size="30" fill="var(--ink)">
+    <rect x="130" y="302" width="86" height="40" fill="var(--paper)" opacity=".92"/><text x="140" y="333">fix</text>
+    <rect x="388" y="302" width="104" height="40" fill="var(--paper)" opacity=".92"/><text x="398" y="333">feat</text>
+    <rect x="590" y="312" width="94" height="40" fill="var(--paper)" opacity=".92"/><text x="600" y="343">docs</text>
+  </g>
+  <g font-size="17" fill="var(--ink)">
+    <rect x="808" y="199" width="18" height="18" fill="url(#h1)" stroke="var(--l1)" stroke-width="1.5"/><text x="838" y="215">fix(api): expire old tokens</text>
+    <rect x="808" y="237" width="18" height="18" fill="url(#h2)" stroke="var(--l2)" stroke-width="1.5"/><text x="838" y="253">feat(web): add the dark theme</text>
+    <rect x="808" y="275" width="18" height="18" fill="url(#h3)" stroke="var(--l3)" stroke-width="1.5"/><text x="838" y="291">docs(web): explain the theme</text>
+  </g>
+  <rect x="800" y="338" width="344" height="114" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+  <path d="M 800 376 H 1144 M 800 414 H 1144" stroke="var(--ink)" stroke-width="1.2"/>
+  <g font-size="17" fill="var(--ink)">
+    <text x="814" y="364" fill="var(--muted)">PLAN</text><text x="916" y="364" font-weight="700">awaits approval</text>
+    <text x="814" y="402" fill="var(--muted)">STAGED</text><text x="916" y="402">nothing yet</text>
+    <text x="814" y="440" fill="var(--muted)">APPROVED</text><path d="M 916 442 H 1130" stroke="var(--ink)" stroke-width="1.4"/>
+  </g>
+  <g font-size="17" fill="var(--ink)">
+    <text x="60" y="490"><tspan fill="var(--ok)" font-weight="700">OK</tspan> scan: no findings in the staged diff</text>
+    <text x="520" y="490"><tspan fill="var(--ok)" font-weight="700">OK</tspan> lint: no FAIL findings</text>
+  </g>
+</svg>
+</div>
+
+<!-- SOCIAL PREVIEW: 640x320, rendered at 2x to 1280x640 PNG; upload by hand in Settings, Social preview. Name and drawing only, 40 px safe border. -->
+<div class="item" id="banner-social" data-social style="width:640px; height:320px">
+<svg width="640" height="320" viewBox="0 0 640 320">
+  <defs><clipPath id="sparcel"><polygon points="368,140 452,124 560,130 588,172 566,212 452,208 374,192"/></clipPath></defs>
+  <text class="nm" x="40" y="148" font-size="60" fill="var(--ink)" letter-spacing="-1.5">commit-</text>
+  <text class="nm" x="40" y="210" font-size="60" fill="var(--ink)" letter-spacing="-1.5">composer</text>
+  <g clip-path="url(#sparcel)">
+    <polygon points="340,100 446,100 440,240 340,240" fill="url(#h1)"/>
+    <polygon points="446,100 516,100 520,240 440,240" fill="url(#h2)"/>
+    <polygon points="516,100 640,100 640,240 520,240" fill="url(#h3)"/>
+  </g>
+  <polygon points="368,140 452,124 560,130 588,172 566,212 452,208 374,192" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+  <g stroke="var(--ink)" stroke-width="2" stroke-dasharray="8 5" fill="none" clip-path="url(#sparcel)"><path d="M446 100 L440 240"/><path d="M516 100 L520 240"/></g>
+  <g><use href="#mon" x="368" y="140"/><use href="#mon" x="452" y="124"/><use href="#mon" x="560" y="130"/><use href="#mon" x="588" y="172"/><use href="#mon" x="566" y="212"/><use href="#mon" x="452" y="208"/><use href="#mon" x="374" y="192"/></g>
+</svg>
+</div><!-- NAV BUTTONS -->
+<div class="item btn" id="nav-how" style="height:56px; width:240px"><svg width="22" height="22"><rect x="2" y="2" width="18" height="18" fill="url(#h1)" stroke="var(--l1)" stroke-width="2"/></svg><span class="nm">HOW IT WORKS</span></div>
+<div class="item btn" id="nav-skills" style="height:56px; width:240px"><svg width="22" height="22"><rect x="2" y="2" width="18" height="18" fill="url(#h2)" stroke="var(--l2)" stroke-width="2"/></svg><span class="nm">TWO SKILLS</span></div>
+<div class="item btn" id="nav-never" style="height:56px; width:240px"><svg width="22" height="22"><rect x="2" y="2" width="18" height="18" fill="url(#h3)" stroke="var(--l3)" stroke-width="2"/></svg><span class="nm">NEVER DOES</span></div>
+<div class="item btn" id="nav-tech" style="height:56px; width:240px"><svg width="22" height="22"><rect x="2" y="2" width="18" height="18" fill="url(#hn)" stroke="var(--ink)" stroke-width="2"/></svg><span class="nm">TECHNICAL</span></div>
+
+<!-- SCENE: one file, two purposes -->
+<div class="item" id="scene-hunks" style="height:444px">
+<svg width="1200" height="444" viewBox="0 0 1200 444">
+  <text class="nm" x="60" y="70" font-size="46" fill="var(--ink)" letter-spacing="-1">One file. Two purposes. Two commits.</text>
+  <text x="62" y="108" font-size="19" fill="var(--muted)">File-level tools ship both under one title. commit-composer cuts at the hunk.</text>
+  <defs><clipPath id="sc1"><polygon points="70,196 300,176 400,262 360,350 120,356 76,290"/></clipPath>
+        <clipPath id="sc2"><polygon points="760,160 940,154 970,214 930,252 770,248"/></clipPath>
+        <clipPath id="sc3"><polygon points="760,300 940,296 976,350 930,392 776,388"/></clipPath></defs>
+  <!-- the one file -->
+  <g clip-path="url(#sc1)"><polygon points="60,160 236,160 224,380 60,380" fill="url(#h1)"/><polygon points="236,160 420,160 420,380 224,380" fill="url(#h2)"/></g>
+  <polygon points="70,196 300,176 400,262 360,350 120,356 76,290" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M236 176 L224 356" stroke="var(--ink)" stroke-width="2" stroke-dasharray="9 6" clip-path="url(#sc1)"/>
+  <g><use href="#mon" x="70" y="196"/><use href="#mon" x="300" y="176"/><use href="#mon" x="400" y="262"/><use href="#mon" x="360" y="350"/><use href="#mon" x="120" y="356"/><use href="#mon" x="76" y="290"/></g>
+  <text x="66" y="150" font-size="19" font-weight="700" fill="var(--ink)">auth.go</text>
+  <g font-size="19" font-weight="700" fill="var(--ink)"><rect x="104" y="262" width="94" height="30" fill="var(--paper)" opacity=".92"/><text x="112" y="283">hunk 1</text><rect x="252" y="262" width="94" height="30" fill="var(--paper)" opacity=".92"/><text x="260" y="283">hunk 2</text></g>
+  <!-- the cut -->
+  <path d="M440 256 H700" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#arr)"/>
+  <!-- the two lots -->
+  <g clip-path="url(#sc2)"><rect x="740" y="140" width="260" height="130" fill="url(#h1)"/></g>
+  <polygon points="760,160 940,154 970,214 930,252 770,248" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+  <g><use href="#mon" x="760" y="160"/><use href="#mon" x="940" y="154"/><use href="#mon" x="970" y="214"/><use href="#mon" x="930" y="252"/><use href="#mon" x="770" y="248"/></g>
+  <g clip-path="url(#sc3)"><rect x="740" y="280" width="260" height="130" fill="url(#h2)"/></g>
+  <polygon points="760,300 940,296 976,350 930,392 776,388" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+  <g><use href="#mon" x="760" y="300"/><use href="#mon" x="940" y="296"/><use href="#mon" x="976" y="350"/><use href="#mon" x="930" y="392"/><use href="#mon" x="776" y="388"/></g>
+  <g font-size="19" font-weight="700" fill="var(--ink)"><rect x="800" y="188" width="94" height="30" fill="var(--paper)" opacity=".92"/><text x="808" y="209">hunk 1</text><rect x="806" y="332" width="94" height="30" fill="var(--paper)" opacity=".92"/><text x="814" y="353">hunk 2</text></g>
+  <g font-size="19" font-weight="700" fill="var(--ink)"><text x="996" y="186">fix(api): expire</text><text x="996" y="212">old tokens</text><text x="1000" y="330">feat(api): add</text><text x="1000" y="356">token refresh</text></g>
+  <text x="70" y="428" font-size="17" fill="var(--muted)">units are named by a hash of the content, so they survive every commit before them</text>
+</svg>
+</div>
+
+<!-- FLOW -->
+<div class="item" id="flow" style="height:640px">
+<svg width="1200" height="640" viewBox="0 0 1200 640">
+  <text class="nm" x="60" y="66" font-size="44" fill="var(--ink)" letter-spacing="-1">The line every change runs on</text>
+  <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-dasharray="10 7"><path d="M80 145 H1120 C1185 145 1185 275 1120 275 H80 C15 275 15 375 80 375 H1120 C1185 375 1185 462 1120 462 H80 C15 462 15 525 80 525 H1120"/></g>
+  <g><use href="#mon" x="1161" y="210"/><use href="#mon" x="39" y="325"/><use href="#mon" x="1161" y="418"/><use href="#mon" x="39" y="493"/></g>
+  <g font-size="17" fill="var(--ink)">
+    <g transform="translate(70,120)"><rect width="220" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">1 snapshot</text></g>
+    <text x="72" y="222" fill="var(--muted)">keep tree id + HEAD id</text>
+    <g transform="translate(330,120)"><rect width="220" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">2 list hunks</text></g>
+    <text x="332" y="222" fill="var(--muted)">commitkit.sh hunks</text>
+    <g transform="translate(590,120)"><rect width="220" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">3 name and group</text></g>
+    <text x="592" y="222" fill="var(--muted)">project, action, target</text>
+    <g transform="translate(850,120)"><rect width="250" height="50" fill="var(--panel)" stroke="var(--l3)" stroke-width="3.5"/><text x="14" y="32" font-weight="700">4 print the plan</text></g>
+    <text x="852" y="222" font-weight="700" fill="var(--l3t)">stop: wait for approval</text>
+    <text x="852" y="246" fill="var(--muted)">plan names the ticket</text>
+    <text x="90" y="330" font-weight="700" fill="var(--ink)">5 for each approved group</text>
+    <g transform="translate(70,350)"><rect width="200" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">reset index</text></g>
+    <g transform="translate(300,350)"><rect width="220" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">patch | apply</text></g>
+    <text x="302" y="428" fill="var(--muted)">git apply --cached</text>
+    <g transform="translate(550,350)"><rect width="160" height="50" fill="var(--panel)" stroke="var(--ok)" stroke-width="3.5"/><text x="14" y="32" font-weight="700">scan</text></g>
+    <text x="552" y="428" fill="var(--l3t)">FAIL: no commit</text>
+    <g transform="translate(740,350)"><rect width="160" height="50" fill="var(--panel)" stroke="var(--ok)" stroke-width="3.5"/><text x="14" y="32" font-weight="700">lint</text></g>
+    <text x="742" y="428" fill="var(--l3t)">FAIL: no commit</text>
+    <g transform="translate(930,350)"><rect width="190" height="50" fill="var(--ok)"/><text x="14" y="32" font-weight="700" fill="var(--paper)">git commit -F</text></g>
+    <text x="932" y="428" fill="var(--muted)">only if both pass</text>
+    <text x="932" y="450" fill="var(--muted)">then next group</text>
+    <text x="714" y="342" font-weight="700" fill="var(--ok)">&amp;&amp;</text>
+    <text x="904" y="342" font-weight="700" fill="var(--ok)">&amp;&amp;</text>
+    <g transform="translate(330,500)"><rect width="220" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">6 verify</text></g>
+    <text x="332" y="578" fill="var(--muted)">git diff HEAD, git log --stat</text>
+    <g transform="translate(700,500)"><rect width="400" height="50" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/><text x="14" y="32" font-weight="700">7 report</text></g>
+    <text x="702" y="578" fill="var(--muted)">hashes, leftovers, both undo ids</text>
+  </g>
+  <text x="60" y="622" font-size="17" fill="var(--muted)">never pushes, never amends, never --no-verify</text>
+</svg>
+</div>
+
+<!-- NEVER: outside the lot line -->
+<div class="item" id="never" style="height:440px">
+<svg width="1200" height="440" viewBox="0 0 1200 440">
+  <text class="nm" x="60" y="70" font-size="44" fill="var(--ink)" letter-spacing="-1">Some moves are not on the plat.</text>
+  <polygon points="60,240 1140,226 1140,350 60,346" fill="url(#hn)"/>
+  <path d="M60 240 L1140 226" stroke="var(--ink)" stroke-width="3" stroke-dasharray="12 8"/>
+  <path d="M60 346 L1140 350 M60 240 V346 M1140 226 V350" stroke="var(--ink)" stroke-width="3"/>
+  
+  <rect x="70" y="302" width="500" height="30" fill="var(--paper)" opacity=".9"/>
+  <text x="78" y="324" font-size="17" fill="var(--muted)">inside the lot line: approved, scanned, local</text>
+  <g font-size="19" font-weight="700" fill="var(--ink)">
+    <text x="60" y="122">no push</text><text x="60" y="148" font-size="17" font-weight="400" fill="var(--muted)">yours to run</text>
+    <text x="270" y="122">no amend, rebase</text><text x="270" y="148" font-size="17" font-weight="400" fill="var(--muted)">tag or branch</text>
+    <text x="500" y="122">no commit before</text><text x="500" y="148" font-size="17" font-weight="400" fill="var(--muted)">you approve the plan</text>
+    <text x="740" y="122">no commit on FAIL</text><text x="740" y="148" font-size="17" font-weight="400" fill="var(--muted)">from scan or lint</text>
+    <text x="960" y="122">no AI trailer</text><text x="960" y="148" font-size="17" font-weight="400" fill="var(--muted)">no co-author line</text>
+  </g>
+  <g stroke="var(--ink)" stroke-width="2"><path d="M70 164 V224"/><path d="M280 164 V222"/><path d="M510 164 V219"/><path d="M750 164 V215"/><path d="M970 164 V212"/></g>
+  <g stroke="var(--l3t)" stroke-width="3.5" fill="var(--paper)" stroke-linecap="round">
+    <g transform="translate(70,240)"><circle r="15"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" fill="none"/></g>
+    <g transform="translate(280,237)"><circle r="15"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" fill="none"/></g>
+    <g transform="translate(510,234)"><circle r="15"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" fill="none"/></g>
+    <g transform="translate(750,231)"><circle r="15"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" fill="none"/></g>
+    <g transform="translate(970,228)"><circle r="15"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" fill="none"/></g>
+  </g>
+  <text x="60" y="412" font-size="17" fill="var(--muted)">every run ends with a tree id and a HEAD id that undo the index and the new commits</text>
+</svg>
+</div>
+
+<!-- TECH: one diff stream, one awk program, two outputs -->
+<div class="item" id="tech-units" style="height:560px">
+<svg width="1200" height="560" viewBox="0 0 1200 560">
+  <text class="nm" x="60" y="66" font-size="44" fill="var(--ink)" letter-spacing="-1">One diff stream, one awk program, one id</text>
+  <g font-size="17">
+    <g transform="translate(60,110)"><rect width="300" height="250" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">diff_stream</text>
+      <text x="16" y="70" fill="var(--ink)">git diff -U0 HEAD</text>
+      <text x="16" y="96" fill="var(--muted)">empty tree if no HEAD</text>
+      <text x="16" y="136" fill="var(--ink)">+ each untracked file</text>
+      <text x="16" y="162" fill="var(--muted)">diff --no-index</text>
+      <text x="16" y="188" fill="var(--muted)">/dev/null as new file</text>
+      <text x="16" y="228" fill="var(--muted)">staged or not, all count</text></g>
+    <g transform="translate(450,110)"><rect width="300" height="250" fill="var(--panel)" stroke="var(--ok)" stroke-width="3.5"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">UNITS_AWK</text>
+      <text x="16" y="70" fill="var(--ink)">unit = one -U0 hunk</text>
+      <text x="16" y="96" fill="var(--muted)">or a whole file:</text>
+      <text x="16" y="122" fill="var(--muted)">binary, mode change,</text>
+      <text x="16" y="148" fill="var(--muted)">submodule, empty</text>
+      <text x="16" y="188" fill="var(--ink)">id = hash(file + body)</text>
+      <text x="16" y="214" fill="var(--muted)">twin units get .2, .3</text></g>
+    <g transform="translate(840,110)"><rect width="300" height="110" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">hunks</text>
+      <text x="16" y="66" fill="var(--muted)">id, file, kind,</text><text x="16" y="90" fill="var(--muted)">ranges, counts, preview</text></g>
+    <g transform="translate(840,250)"><rect width="300" height="110" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">patch &lt;id&gt; ...</text>
+      <text x="16" y="66" fill="var(--muted)">only those units, offsets</text><text x="16" y="90" fill="var(--muted)">recomputed</text></g>
+    <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-dasharray="10 7"><path d="M360 235 H446" marker-end="url(#arr)"/><path d="M750 235 C800 235 790 165 836 165" marker-end="url(#arr)"/><path d="M750 235 C800 235 790 305 836 305" marker-end="url(#arr)"/></g>
+    <g transform="translate(840,400)"><rect width="300" height="54" fill="var(--ok)"/><text x="16" y="34" font-weight="700" fill="var(--paper)">git apply --cached</text></g>
+    <path d="M990 360 V396" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#arr)"/>
+    <text x="60" y="410" fill="var(--ink)" font-weight="700">the agent runs every git command that writes</text>
+    <text x="60" y="440" fill="var(--muted)">commitkit.sh only reads and computes</text>
+    <text x="60" y="500" fill="var(--muted)">POSIX sh + POSIX awk: dash and mawk, macOS sh and BWK awk, Git for Windows</text>
+  </g>
+</svg>
+</div>
+
+<div class="item" id="tech-offset" style="height:520px">
+<svg width="1200" height="520" viewBox="0 0 1200 520">
+  <text class="nm" x="60" y="66" font-size="44" fill="var(--ink)" letter-spacing="-1">Leave a hunk behind, keep the next one on its line</text>
+  <g font-size="17">
+    <text x="60" y="118" fill="var(--muted)">auth.go has two hunks. Only hunk 2 is in this commit.</text>
+    <g transform="translate(60,150)"><rect width="500" height="230" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">the full diff</text>
+      <rect x="16" y="56" width="468" height="54" fill="url(#h1)" stroke="var(--l1)" stroke-width="2"/><text x="30" y="90" font-weight="700" fill="var(--ink)">hunk 1  @@ -10,0 +11,3 @@</text>
+      <rect x="16" y="126" width="468" height="54" fill="url(#h2)" stroke="var(--l2)" stroke-width="2"/><text x="30" y="160" font-weight="700" fill="var(--ink)">hunk 2  @@ -40,2 +43,2 @@</text>
+      <text x="16" y="210" fill="var(--muted)">+43 counts hunk 1's 3 new lines</text></g>
+    <path d="M566 265 H640" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#arr)"/>
+    <g transform="translate(650,150)"><rect width="490" height="230" fill="var(--panel)" stroke="var(--ok)" stroke-width="3.5"/>
+      <text x="16" y="34" font-weight="700" fill="var(--ink)">patch, hunk 2 only</text>
+      <rect x="16" y="56" width="458" height="54" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="7 6"/><text x="30" y="90" fill="var(--muted)">hunk 1 left out: shift 0</text>
+      <rect x="16" y="126" width="458" height="54" fill="url(#h2)" stroke="var(--l2)" stroke-width="2"/><text x="30" y="160" font-weight="700" fill="var(--ink)">hunk 2  @@ -40,2 +40,2 @@</text>
+      <text x="16" y="210" fill="var(--muted)">new start = old start + shift</text></g>
+    <text x="60" y="430" fill="var(--ink)" font-weight="700">shift adds new minus old line counts of the selected hunks above</text>
+    <text x="60" y="460" fill="var(--muted)">a pure insertion starts at old + 1, a pure deletion at old - 1</text>
+    <text x="60" y="490" fill="var(--muted)">a start copied from the full diff lands an insertion a line early, and git apply still exits 0</text>
+  </g>
+</svg>
+</div>
+
+<!-- TWO SKILLS -->
+<div class="item" id="skills" style="height:600px">
+<svg width="1200" height="600" viewBox="0 0 1200 600">
+  <text class="nm" x="60" y="66" font-size="44" fill="var(--ink)" letter-spacing="-1">Pick the lot for the job</text>
+  <g transform="translate(60,110)">
+    <rect width="520" height="450" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+    <text class="nm" x="24" y="52" font-size="32" fill="var(--ink)" letter-spacing="-.5">commit-composer</text>
+    <text x="24" y="84" font-size="17" fill="var(--muted)">short and meaningful</text>
+    <rect x="24" y="110" width="472" height="150" fill="var(--paper)" stroke="var(--cardline)" stroke-width="1.5"/>
+    <g font-size="17" fill="var(--ink)"><text x="40" y="146" font-weight="700">feat(web): add the dark theme</text><text x="40" y="190">- follows the system setting</text><text x="40" y="220">- keeps the light logo readable</text></g>
+    <g font-size="17" fill="var(--ink)"><text x="24" y="304">title aimed at 50 characters</text><text x="24" y="334">body optional, 2 to 5 bullets</text><text x="24" y="364">lint --concise</text></g>
+    <g><polygon points="24,414 64,392 112,398 120,422 70,428" fill="url(#hn)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/></g>
+  </g>
+  <g transform="translate(620,110)">
+    <rect width="520" height="450" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+    <text class="nm" x="24" y="52" font-size="32" fill="var(--ink)" letter-spacing="-.5">commit-composer-max</text>
+    <text x="24" y="84" font-size="17" fill="var(--muted)">audit-grade, read instead of the diff</text>
+    <rect x="24" y="110" width="472" height="210" fill="var(--paper)" stroke="var(--cardline)" stroke-width="1.5"/>
+    <g font-size="17" fill="var(--ink)"><text x="40" y="142" font-weight="700">feat(web): add the dark theme</text>
+      <text x="40" y="176" font-weight="700" fill="var(--l2t)">Why:</text><text x="40" y="200">- the reason and the goal</text>
+      <text x="40" y="232" font-weight="700" fill="var(--l2t)">Changes:</text><text x="40" y="256">- path: symbol - before, now</text>
+      <text x="40" y="288" font-weight="700" fill="var(--l2t)">Risk and verification:</text><text x="40" y="310">- what ran, what was seen</text></g>
+    <g font-size="17" fill="var(--ink)"><text x="24" y="352">body always, no length limit</text><text x="24" y="376">lint --max</text></g>
+    <g><polygon points="24,414 70,388 168,392 232,404 244,424 150,430 70,430" fill="url(#hn)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/></g>
+  </g>
+</svg>
+</div>
+
+</div>
+<script>
+(function () {
+  var ns = "http://www.w3.org/2000/svg";
+  var lots = document.getElementById("lots"), lines = document.getElementById("lines");
+  function poly(parent, pts, attrs) { var p = document.createElementNS(ns, "polygon"); p.setAttribute("points", pts.map(function (q) { return q.join(","); }).join(" ")); for (var k in attrs) p.setAttribute(k, attrs[k]); parent.appendChild(p); }
+  function seg(parent, x1, y1, x2, y2) { var l = document.createElementNS(ns, "line"); l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2); parent.appendChild(l); }
+  // v is a few pixels: the two lot lines lean one way, then the other
+  window.drawBanner = function (v) {
+    v = v || 0;
+    lots.innerHTML = ""; lines.innerHTML = "";
+    var a1 = 318 + v, a2 = 300 + v, b1 = 530 - v, b2 = 545 - v;
+    poly(lots, [[0, 150], [a1, 150], [a2, 480], [0, 480]], { fill: "url(#h1)" });
+    poly(lots, [[a1, 150], [b1, 150], [b2, 480], [a2, 480]], { fill: "url(#h2)" });
+    poly(lots, [[b1, 150], [800, 150], [800, 480], [b2, 480]], { fill: "url(#h3)" });
+    seg(lines, a1, 150, a2, 480); seg(lines, b1, 150, b2, 480);
+  };
+  window.drawBanner(0);
+})();
+</script>
+</body>
+</html>

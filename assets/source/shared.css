@@ -1,16 +1,16 @@
-/* Illustration styles for commit-composer: a railway classification yard.
+/* Illustration styles for commit-composer: a subdivision plat.
    Contract with render.py: .item blocks with unique ids inside .sheet, zoom 2,
    theming through html[data-theme="dark"], --cardline as the image border. */
 
 :root {
-  --paper: #e7e9e4; --ink: #1f2a2e; --muted: #4a565a; --cardline: #c3c8c2;
-  --amber: #9a6200; --green: #2c7a4b; --slate: #5a676c; --red: #b3372b;
-  --rail: #6d7a7f; --sleeper: #b9bfb8; --panel: #f4f5f1; --onwagon: #ffffff;
+  --paper: #ebe9e0; --panel: #f6f4ec; --ink: #16263d; --muted: #566377; --cardline: #bdbbb1;
+  --l1: #0f8b8d; --l2: #c88a0a; --l3: #d2462a;
+  --l2t: #8a5a00; --l3t: #b83a1d; --ok: #146c41;
 }
 html[data-theme="dark"] {
-  --paper: #141a1d; --ink: #e3e8e4; --muted: #a6b1b4; --cardline: #2e383c;
-  --amber: #ffb53d; --green: #5fcf8a; --slate: #8b989c; --red: #ff7a6b;
-  --rail: #7d898e; --sleeper: #2b3438; --panel: #1c2427; --onwagon: #141a1d;
+  --paper: #0c1620; --panel: #13212d; --ink: #e3ecf2; --muted: #9db0bf; --cardline: #25343f;
+  --l1: #37c6c8; --l2: #f0b52e; --l3: #ff7a59;
+  --l2t: #f0b52e; --l3t: #ff8e72; --ok: #46d890;
 }
 
 * { box-sizing: border-box; }
@@ -18,8 +18,10 @@ html, body { margin: 0; padding: 0; background: #888; }
 .sheet { width: max-content; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 .item {
   zoom: 2; position: relative; overflow: hidden; width: 1200px;
-  font-family: "JetBrains Mono", monospace; color: var(--ink); background: var(--paper);
+  font-family: "Fragment Mono", monospace; color: var(--ink); background: var(--paper);
 }
-.disp { font-family: "Saira Condensed", sans-serif; font-weight: 800; }
+.nm { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; }
+svg text { font-family: "Fragment Mono", monospace; }
+svg text.nm { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; }
 .btn { width: 240px; display: flex; align-items: center; justify-content: center; gap: 12px; }
-.btn .disp { font-size: 30px; letter-spacing: .02em; }
+.btn .nm { font-size: 26px; letter-spacing: .01em; }
