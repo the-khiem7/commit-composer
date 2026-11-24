@@ -48,6 +48,18 @@ Either one prints FAIL, and that commit does not happen: the two checks run unpi
 | commits with short, meaningful messages | `commit-composer` | a title aimed at 50 characters and an optional body of 2 to 5 one-line bullets |
 | a log another agent can audit without reading the code | `commit-composer-max` | `Why:`, `Changes:`, and `Risk and verification:` blocks naming every changed file and symbol, the risks, and what was checked |
 
+### Inside Orca
+
+`commit-composer-headless-orca` is not for an agent client. It is the Command template of Orca's Generate Commit Message dialog, which runs the agent with `Read`, `Grep`, and `Glob` only: no shell, so no `commitkit.sh`. It writes one message for the staged set from the patch Orca sends, checks it against a checklist in place of `scan` and `lint`, and prints nothing but the message, because Orca commits whatever stdout holds. Written against Orca 1.4.272; other IDEs differ and are not covered.
+
+```text
+/commit-composer-headless-orca
+Mode: max
+{stagedPatch}
+```
+
+`Mode: max` gives the audit-grade shape, `Mode: short` the short one. A variable the template leaves out is never sent, and the agent has no shell to read the diff itself, so `{stagedPatch}` is the one Orca variable the skill needs. The staged files come from the patch, and the ticket follows the commit composer rule, not Orca's `{linkedIssue}`. Without a patch the skill prints a one-line STOP in the Message box.
+
 The title is always `type(project): subject`. The project is the name of the baseline pack that claims the changed path, else the folder of the nearest manifest. A message never carries a pack identifier, phase number, or pack filename.
 
 ## What it will never do
