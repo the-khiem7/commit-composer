@@ -3,15 +3,15 @@ baseline_schema: "2.0"
 pack: "commit-composer"
 document: "introduction"
 status: "active"
-updated: "2026-10-29"
-code_ref: "uncommitted"
+updated: "2026-11-24"
+code_ref: "8883ed1"
 ---
 
 # Commit Composer
 
 ## Scope
 
-The design of `commit-composer` and `commit-composer-max`: how they group a working tree at hunk level, the shared convention and read-only kit they ship, and why they live in their own repository.
+The design of `commit-composer`, `commit-composer-max` and `commit-composer-headless-orca`: how the first two group a working tree at hunk level, the shared convention and read-only kit they ship, how the third writes one message inside Orca's commit dialog without a shell, and why they live in their own repository.
 
 Out of scope, and owned elsewhere:
 
@@ -28,14 +28,16 @@ Out of scope, and owned elsewhere:
 | shared assets | byte-identical copies of `contract/commit-convention.md` and `contract/commitkit.sh` in each skill folder. Pinned by `tests/test_commit_skills.py` |
 | kit | `commitkit.sh`: `hunks`, `patch`, `scan`, `lint`. POSIX sh and awk, computes and never writes. Tested by `tests/test_commitkit.py` |
 | work ticket | optional `Refs: <key> <url>` trailer, from the thread, a pack `**Ticket:**` line, or one question in the plan; `lint` FAILs `trailer-not-last`. CC-D3 |
+| headless skill | `commit-composer-headless-orca`: the Command template of Orca's Generate Commit Message dialog (Orca 1.4.272 runs the agent with `Read`, `Grep`, `Glob` only, prompt on stdin, stdout taken as the message). Ships `SKILL.md` and the convention copy, no kit. Template: skill name, `Mode: max\|short`, `{stagedPatch}`. CC-D8 |
+| headless skill, open | `agents/openai.yaml` is absent and 2 tests that pin it fail. CC-Q1 |
 | version | one top-level `version:` in each `SKILL.md`, one value for both, stamped by `scripts/release.py`. Initial value `1.0.0`. CC-D2 |
 | origin | split from the `baselinedocs-skills` repository with `git filter-repo`; history of the moved paths preserved. CC-D2 |
-| not observed | a host selecting either skill from a plain request; mawk and BWK awk running `commitkit.sh`; `.github/workflows/tests.yml` on three operating systems |
+| not observed | a host selecting either skill from a plain request; mawk and BWK awk running `commitkit.sh`; `.github/workflows/tests.yml` on three operating systems; the headless skill run inside Orca |
 | test command | `uvx --from "pytest>=8,<10" --with pyyaml pytest tests/ -q`, green on Windows with Git for Windows sh and gawk |
 
 ## Target
 
-Two explicit-entrypoint skills that commit a working tree in single-purpose groups, never push, and never stage a secret. Reached for the design; the open items are the unobserved rows above.
+Two explicit-entrypoint skills that commit a working tree in single-purpose groups, never push, and never stage a secret, plus a third that writes one message for Orca's dialog with no shell. Reached for the design; the open items are the unobserved rows above.
 
 ## Constraints
 

@@ -3,8 +3,8 @@ baseline_schema: "2.0"
 pack: "commit-composer"
 document: "roadmap"
 status: "active"
-updated: "2026-10-29"
-code_ref: "uncommitted"
+updated: "2026-11-24"
+code_ref: "8883ed1"
 ---
 
 # Commit Composer Roadmap
@@ -18,6 +18,7 @@ Reasoning for every row lives in `commit-composer.hallucination.md` under the en
 | Hunk-level grouping through a shared convention and read-only kit | CC-D1 | implemented, host selection unobserved | `contract/commit-convention.md`, `contract/commitkit.sh`; `tests/test_commit_skills.py` pins copies, folder shape and gates; `tests/test_commitkit.py` holds one case per rule |
 | Separate repository | CC-D2 | implemented, first release unobserved | history of the moved paths preserved by `git filter-repo`; `scripts/release.py`, `scripts/stamp_version.py`, `.github/workflows/` carried over |
 | Work ticket trailer | CC-D3 | implemented, host use unobserved | `contract/commit-convention.md` sections `Message format` and `Work ticket`, procedure step 4; `trailer-not-last` in `contract/commitkit.sh`; seven cases in `tests/test_commitkit.py` |
+| Headless skill for Orca's commit dialog | CC-D8 | implemented, never run in Orca; 2 tests fail while `agents/openai.yaml` is absent (CC-Q1) | `commit-composer-headless-orca/SKILL.md` and `references/commit-convention.md`; `tests/test_commit_skills.py` pins its shape, the convention copy, the `{stagedPatch}` template and the STOP line; `README.md` section `Inside Orca` |
 
 ## CC-P1: split the skills out of `baselinedocs-skills`
 
@@ -67,7 +68,37 @@ Changes:
 | both `SKILL.md` | the pack-reading non-goal names work ticket lines |
 | both skill folders | copies of the two canonical files |
 
+## CC-P3: add the headless skill for Orca's commit dialog
+
+Opened and closed 2026-11-24 (implementation; Orca run pending). CC-D8 carries the reasoning and the rejected options.
+
+Acceptance criteria:
+
+- `commit-composer-headless-orca/` holds `SKILL.md`, `references/commit-convention.md` byte-identical to `contract/`, and no `scripts/`
+- the skill needs only `Read`, `Grep`, `Glob`, and one Orca variable, `{stagedPatch}`
+- a prompt without a patch, and a patch holding a credential, each print one STOP line and no message
+- the suite pins the above and stays green
+
+### Checkpoint: implemented, suite red on one open question, Orca run unobserved
+
+| Item | Result |
+|---|---|
+| Verification gate | `uvx --from "pytest>=8,<10" --with pyyaml pytest tests/ -q`: 41 passed, 76 skipped when `agents/openai.yaml` existed (skips: no POSIX `sh` on PATH under Windows PowerShell); 39 passed, 2 failed on the next run after the file was gone |
+| Not observed | the dialog resolving `/commit-composer-headless-orca`; stdout reaching the Message box; the patch size at which Orca cuts it; a later `--allowedTools` overriding Orca's |
+| Commit | uncommitted |
+
+Changes:
+
+| File | Change |
+|---|---|
+| `commit-composer-headless-orca/SKILL.md` | new: prompt contract, project naming with `Grep`/`Glob`, short and max shapes, checklist, secret and patch STOP lines, output rule |
+| `commit-composer-headless-orca/references/commit-convention.md` | new: copy of the canonical convention |
+| `tests/test_commit_skills.py` | `HEADLESS_SKILL`, `ALL_SKILLS`; shape, copy, convention gate, output contract, template-variable and STOP tests |
+| `README.md` | section `Inside Orca` with the three-line template |
+
 ## Next action
+
+CC-P3 first: answer CC-Q1 (keep or drop `commit-composer-headless-orca/agents/openai.yaml`), then rerun the suite until it is green. Install the skill where Orca's Claude reads skills, paste the three-line template from `README.md` (`/commit-composer-headless-orca`, `Mode: max`, `{stagedPatch}`) into the Generate Commit Message dialog and press Generate on a small staged change. Check that stdout alone reaches the Message box, that the subject has no stray lead-in, and that a staged change with no patch variable produces the `patch-check` STOP line. Then try a large staged change to find where Orca cuts the patch. Nothing in CC-P3 waits on the user except CC-Q1.
 
 Commit the working tree, add a GitHub remote named `commit-composer` under the personal account, then run `uv run scripts/release.py v1.0.0` and the two pushes it prints. Confirm the first `tests.yml` run is green on all three operating systems, since only gawk has run `commitkit.sh`. Then use each skill once on a real working tree and check that a host selects it from a plain request such as "commit these in groups". Nothing in CC-P1 waits on a user decision.
 

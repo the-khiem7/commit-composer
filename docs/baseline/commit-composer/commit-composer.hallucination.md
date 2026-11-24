@@ -3,8 +3,8 @@ baseline_schema: "2.0"
 pack: "commit-composer"
 document: "hallucination"
 status: "active"
-updated: "2026-11-14"
-code_ref: "uncommitted"
+updated: "2026-11-24"
+code_ref: "8883ed1"
 ---
 
 # Commit Composer: Decisions and Open Questions
@@ -21,6 +21,9 @@ One row per entry. A row states what the entry is about and nothing more. An ans
 | CC-D4 | one commit may span the pack documents of one initiative when the action and target are the same | current | CC-D1 |
 | CC-D5 | `scan` and `lint` run unpiped, and the commit command is chained behind both so a FAIL stops it | current | CC-D1 |
 | CC-D6 | the commit title has no length limit; `--concise` keeps its 50-character WARN | current | CC-D1, CC-D3 |
+| CC-D7 | `scan` reports a quoted secret-like assignment inside a test file as a WARN, not a FAIL | current | CC-D1, CC-D5, CC-D6 |
+| CC-D8 | a third skill, `commit-composer-headless-orca`, writing one message from the patch Orca's Generate Commit Message dialog sends, with no shell | current | CC-D1, CC-D3, CC-Q1 |
+| CC-Q1 | whether the headless skill keeps `agents/openai.yaml` | open | CC-D8 |
 
 ## CC-D1: `commit-composer` and `commit-composer-max` commit a working tree at hunk level through a shared convention and a read-only kit
 
@@ -68,7 +71,11 @@ Carried over from the `baselinedocs-skills` pack, where it was recorded as FD-D4
 
 ## Open questions
 
-No open question is recorded.
+### CC-Q1: does `commit-composer-headless-orca` keep `agents/openai.yaml`
+
+Orca does not read that file, and a Codex host would never select this skill by its own, since the skill is written for one dialog. `tests/test_commit_skills.py` still pins the file (`test_openai_yaml_is_an_explicit_entrypoint`, `test_headless_folder_shape`) and 2 tests fail while it is absent. The file existed when the suite last passed (41 passed) and was gone at the next run; who removed it is unknown.
+
+Recommendation: restore it with `allow_implicit_invocation: false`, the guard every skill of this repository carries so that no agent selects a skill that commits or stands in for a dialog. Dropping it instead means removing both pins and stating the exception here.
 
 ## CC-D3: an optional `Refs: <key> <url>` trailer names the work ticket, from the thread, a pack ticket line, or one question in the plan
 
@@ -127,3 +134,39 @@ No open question is recorded.
 **Accepted cost.** Views that cut a long title, such as `git log --oneline` in a narrow terminal or a hosting page, show it truncated; nothing now warns for it outside `--concise` [agent].
 
 **Rejected: remove the 50-character aim of `--concise` as well.** Would change both `SKILL.md` files, the README and the rendered image [user].
+
+## CC-D7: `scan` reports a quoted secret-like assignment inside a test file as a WARN, not a FAIL
+
+**Decided.** In `contract/commitkit.sh`, the `credential-assignment` rule prints `WARN credential-assignment-in-test-file <file>:<line>` and does not fail the scan when the file is a test file: a path with a `tests/`, `test/`, `__tests__/` or `spec/` folder, a name `test_*`, a name ending `_test.*`, `.test.*`, `_spec.*` or `.spec.*`, or `*.tftest.hcl` / `*.tftest.json`. The final line then reads `OK scan: no FAIL findings; <n> WARN in test files, read each named line before committing`. A private key block, an AWS access key id and an AWS secret access key assignment stay FAIL in a test file. `contract/commit-convention.md` step 4 tells the agent to check each such line with the value hidden (length, `arn:` prefix, `mock` or `dummy` marker), report it in the run summary and treat a real-looking value as a FAIL. Copied into both skills; `tests/test_commitkit.py` gains cases for six test-file shapes, the two rules that still fail, and a non-test name that must still fail. Owner, 2026-11-18.
+
+**Why.** Terraform and unit-test fixtures mock a secret with a quoted value (a quoted `db_password` value in `*.tftest.hcl`, mock secret ARNs), and a promotion of an existing Terraform tree failed `scan` on 9 such lines, which the owner judged false positives and asked to bypass [user]. A FAIL the agent must override teaches it to read FAIL lines as optional (see CC-D3, CC-D6) [agent]. A WARN keeps the line named in the output, so the check is not silenced [agent].
+
+**What breaks if ignored.** Every commit touching a test fixture needs a manual override of `scan`, and a later real finding is overridden with the same habit.
+
+**Accepted cost.** Pattern matching on a path: a real secret pasted into a file under `tests/` is reported as a WARN and the commit chain `scan && lint && git commit` no longer stops it; only the agent reading the WARN and the key and access-key rules stand in the way. A non-test file that merely resembles a test name (`latest.cfg`) still fails, but a secret placed in a real test folder is not caught as a FAIL [agent]. The rule that stayed FAIL covers key blocks and AWS key ids, not other credential shapes.
+
+**Rejected: bypass every `credential-assignment` FAIL in every file.** Hides a real secret in application config [user chose test files only].
+
+**Rejected: a `--allow-test-files` flag.** The chained commit command would need the flag on every run and an agent can forget it, which reproduces the override habit [agent].
+
+**Rejected: skip test files in `scan` entirely.** A private key block in a fixture is still a leak [agent].
+
+## CC-D8: `commit-composer-headless-orca` writes one message from the patch in the prompt, for Orca's Generate Commit Message dialog, with no shell
+
+**Decided.** A third skill folder `commit-composer-headless-orca` holding `SKILL.md`, a byte-identical copy of `contract/commit-convention.md` in `references/`, and no `scripts/`. It is the Command template of the dialog, not an agent-client entrypoint. The template is `/commit-composer-headless-orca`, a `Mode: max` or `Mode: short` line (missing or unknown means `short`), then `{stagedPatch}`. The skill takes the staged files from the `diff --git` lines of the patch, takes a ticket only from a pack `**Ticket:**` line found with `Grep` (else none, never asked), and does not use `{branch}`, `{stagedFiles}` or `{linkedIssue}`. A checklist in `SKILL.md` stands in for `lint`; a credential in the added lines prints one `chore(secret-check): STOP - ...` line instead of a message. A prompt with no `diff --git` line, or with the diff omitted, prints one `chore(patch-check): STOP - no staged patch ...` line and the skill does not describe the working tree. Output is the message alone. Written against Orca 1.4.272, which `SKILL.md` states. Owner, 2026-11-24.
+
+**Why.** `commit-composer-max` stopped inside the dialog because the session had no Bash and the skill gates every commit on `scan` and `lint` [user]. Orca 1.4.272 (read from the installed bundle, not from its documentation) runs `claude -p --output-format text --model <m> --tools Read,Grep,Glob --allowedTools Read,Grep,Glob --permission-mode dontAsk --strict-mcp-config --settings {"disableAllHooks":true}` with the prompt on stdin; of the user's CLI arguments only `--model` replaces its own, the rest are appended [agent]. It takes all of stdout as the message, cuts a final period from the first line, and falls back to `Update project files` when stdout is empty [agent]. A custom Command template replaces Orca's own prompt, and a variable the template does not name is never sent, so the agent sees no diff unless `{stagedPatch}` is in the template, and it cannot run `git diff --cached` itself [agent]. The user wanted the skill to own the ticket and the file list under the commit composer standard rather than Orca's variables, which could conflict with it [user].
+
+**What breaks if ignored.** A skill that needs a shell halts in the dialog. A template without `{stagedPatch}` gives the agent nothing to describe and invites a message invented from the working tree. Any preamble or code fence the agent prints becomes part of the commit title or body, because stdout is the message.
+
+**Accepted cost.** Never run inside Orca: every Orca fact above comes from reading the bundle, which is minified and changes per version, and nothing yet shows that the dialog resolves `/commit-composer-headless-orca` from the installed skills folder. The size at which Orca cuts the patch is not established. Appending `--allowedTools Bash` through CLI arguments was not tried. The checklist is prose, so only string pins in `tests/test_commit_skills.py` guard it, and `commitkit.sh lint` rules are not run against its output. The copied convention still carries Grouping, Procedure and `commitkit.sh` text that the skill tells the agent to skip, so a reader of that file sees rules this skill does not follow. The `version:` was written by hand to equal the other two (`1.1.0`) so `test_version.py` passes; `scripts/release.py` overwrites it.
+
+**Rejected: a no-shell mode inside `commit-composer-max`.** Grows a `SKILL.md` that holds only what differs, and mixes an interactive procedure with a headless one [user chose the third skill].
+
+**Rejected: the names `commit-composer-ide`, `commit-composer-headless`, `orca-commit-message`.** The first claims coverage of IDEs whose configuration differs, the second names no host, the third leaves the `commit-composer-*` family [user chose `commit-composer-headless-orca`].
+
+**Rejected: a template naming `{branch}`, `{linkedIssue}`, `{stagedFiles}` and `{stagedPatch}`.** Duplicates the ticket and staged-file rules the convention already owns and can disagree with them [user].
+
+**Rejected: granting Bash through the dialog's CLI arguments.** Works against the isolation Orca applies on purpose, and nothing shows that a later `--tools` or `--allowedTools` wins over the one Orca writes [agent].
+
+**Rejected: describing the working tree when the patch is missing.** The message could not be traced to a diff, which defeats the audit purpose of `Mode: max` [user approved the STOP line, 2026-11-24].
