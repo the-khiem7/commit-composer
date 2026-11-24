@@ -1,31 +1,32 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>og</title>
 <!-- Social preview, 1200x630, recomposed from the landing page hero.
-     Signature: railway classification yard; hunks are wagons, commits are trains, the gates are a signal. Saira Condensed 800 and JetBrains Mono, rail yard tokens on the dark ground.
+     Signature: a subdivision plat; the parcel is divided into lots, each recorded under its own title. Bricolage Grotesque 800 and Fragment Mono, plat tokens on the night sheet.
      Render: uvx --from playwright python -I <frontdoor-landing>/scripts/shoot.py og assets/source/og.html --out assets/og.png --root assets -->
-<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800&family=Fragment+Mono&display=swap" rel="stylesheet">
 <style>
-html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #141a1d; color: #e3e8e4; font-family: "JetBrains Mono", monospace; }
-h1 { font: 800 120px/1 "Saira Condensed", sans-serif; color: #ffb53d; margin: 0; position: absolute; left: 64px; top: 52px; }
-p { position: absolute; left: 66px; top: 192px; font-size: 28px; font-weight: 700; margin: 0; }
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #0c1620; color: #e3ecf2; font-family: "Fragment Mono", monospace; }
+h1 { font: 800 124px/1 "Bricolage Grotesque", sans-serif; letter-spacing: -3px; margin: 0; position: absolute; left: 60px; top: 56px; white-space: nowrap; }
+p { position: absolute; left: 64px; top: 202px; font-size: 28px; font-weight: 700; margin: 0; }
 svg { position: absolute; left: 0; top: 250px; }
 </style></head><body>
 <h1>commit-composer</h1>
 <p>Messy working tree in. Clean, single-purpose commits out.</p>
-<svg width="1200" height="380" viewBox="0 0 1200 380" font-family="JetBrains Mono" font-size="17" font-weight="700" fill="#e3e8e4">
-  <defs><pattern id="t" width="14" height="12" patternUnits="userSpaceOnUse"><rect width="4" height="12" fill="#2b3438"/></pattern></defs>
-  <rect x="0" y="192" width="420" height="12" fill="url(#t)"/>
-  <g fill="none" stroke="#7d898e" stroke-width="3">
-    <path d="M0 194H420M0 202H420"/>
-    <path d="M420 194C520 194,520 64,620 64H1200M420 202C520 202,520 72,620 72H1200"/>
-    <path d="M420 194H1200M420 202H1200"/>
-    <path d="M420 194C520 194,520 324,620 324H1200M420 202C520 202,520 332,620 332H1200"/>
+<svg width="1200" height="380" viewBox="0 0 1200 380" font-family="Fragment Mono" font-size="22" fill="#e3ecf2">
+  <defs>
+    <pattern id="a" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="#37c6c8" opacity=".16"/><rect width="2" height="9" fill="#37c6c8" opacity=".8"/></pattern>
+    <pattern id="b" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="9" height="9" fill="#f0b52e" opacity=".16"/><rect width="2" height="9" fill="#f0b52e" opacity=".85"/></pattern>
+    <pattern id="c" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#ff7a59" opacity=".16"/><rect width="2" height="9" fill="#ff7a59" opacity=".8"/></pattern>
+    <clipPath id="p"><polygon points="64,70 380,34 800,50 872,170 790,300 340,292 84,262"/></clipPath>
+  </defs>
+  <g clip-path="url(#p)"><polygon points="0,0 360,0 346,380 0,380" fill="url(#a)"/><polygon points="360,0 640,0 650,380 346,380" fill="url(#b)"/><polygon points="640,0 1000,0 1000,380 650,380" fill="url(#c)"/></g>
+  <g stroke="#e3ecf2" stroke-width="3" stroke-dasharray="11 8" fill="none" clip-path="url(#p)"><path d="M360 0 L346 380"/><path d="M640 0 L650 380"/></g>
+  <polygon points="64,70 380,34 800,50 872,170 790,300 340,292 84,262" fill="none" stroke="#e3ecf2" stroke-width="4" stroke-linejoin="round"/>
+  <g fill="#0c1620" stroke="#e3ecf2" stroke-width="3"><circle cx="64" cy="70" r="8"/><circle cx="380" cy="34" r="8"/><circle cx="800" cy="50" r="8"/><circle cx="872" cy="170" r="8"/><circle cx="790" cy="300" r="8"/><circle cx="340" cy="292" r="8"/><circle cx="84" cy="262" r="8"/></g>
+  <g font-weight="700">
+    <rect x="96" y="150" width="236" height="44" fill="#0c1620" opacity=".9"/><text x="108" y="180">fix(api)</text>
+    <rect x="392" y="150" width="226" height="44" fill="#0c1620" opacity=".9"/><text x="404" y="180">feat(web)</text>
+    <rect x="676" y="150" width="160" height="44" fill="#0c1620" opacity=".9"/><text x="688" y="180">docs(web)</text>
   </g>
-  <g transform="translate(372,130)"><rect x="-4" y="0" width="8" height="64" fill="#e3e8e4"/><rect x="-18" y="-46" width="36" height="54" rx="9" fill="#e3e8e4"/><circle cx="0" cy="-19" r="12" fill="#5fcf8a"/></g>
-  <rect x="660" y="26" width="120" height="36" rx="6" fill="#ffb53d"/><text x="674" y="50" fill="#141a1d">auth.go 1</text><text x="800" y="50">fix(api): expire old tokens</text>
-  <rect x="660" y="156" width="120" height="36" rx="6" fill="#5fcf8a"/><text x="674" y="180" fill="#141a1d">theme.css</text><text x="800" y="180">feat(web): add the dark theme</text>
-  <rect x="660" y="286" width="120" height="36" rx="6" fill="#8b989c"/><text x="674" y="310" fill="#141a1d">README</text><text x="800" y="310">docs(web): explain the theme</text>
-  <rect x="40" y="156" width="120" height="36" rx="6" fill="#ffb53d"/><text x="54" y="180" fill="#141a1d">auth.go 2</text>
-  <text x="40" y="250" font-weight="400" fill="#a6b1b4">stopped at the plan, then scan OK, lint OK</text>
 </svg>
 </body></html>
