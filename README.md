@@ -28,7 +28,7 @@ Real work is tangled: one file holds a bug fix and half a feature. commit-compos
 
 Every run follows the same line, and it always stops at the plan. Nothing is staged or committed until you approve the grouping, and you can regroup, rename, or drop any group first.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/flow-dark.webp"><img src="assets/flow.webp" alt="The line every change runs on. 1 snapshot: keep the tree id and HEAD id. 2 list hunks with commitkit.sh hunks. 3 name the project and group by project, action, target. 4 print the plan, then stop and wait for approval. 5 for each approved group: reset the index, patch and git apply --cached, scan, lint, git commit -F, then the next group; a FAIL from scan or lint means no commit. 6 verify with git diff HEAD and git log --stat. 7 report the hashes, the leftover units, and both undo ids. It never pushes, never amends, never uses --no-verify." width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/flow-dark.webp"><img src="assets/flow.webp" alt="The line every change runs on. 1 snapshot: keep the tree id and HEAD id. 2 list hunks with commitkit.sh hunks. 3 name the project and group by project, action, target. 4 print the plan, naming the ticket, then stop and wait for approval. 5 for each approved group: reset the index, patch and git apply --cached, then scan && lint && git commit -F chained, so the commit runs only if both pass, then the next group; a FAIL from scan or lint means no commit. 6 verify with git diff HEAD and git log --stat. 7 report the hashes, the leftover units, and both undo ids. It never pushes, never amends, never uses --no-verify." width="100%"></picture>
 
 Before every commit, two checks run on what is about to land:
 
@@ -37,7 +37,7 @@ Before every commit, two checks run on what is about to land:
 | `commitkit.sh scan` | reads the staged diff for keys and credentials; it names the file and the rule, never the value |
 | `commitkit.sh lint` | checks the message against the format; `--concise` or `--max` per skill |
 
-Either one prints FAIL, and that commit does not happen. Both print an `OK` line on a pass.
+Either one prints FAIL, and that commit does not happen: the two checks run unpiped and chained in front of `git commit`, so a FAIL stops it without anyone reading the output. Both print an `OK` line on a pass.
 
 ## Two skills
 
